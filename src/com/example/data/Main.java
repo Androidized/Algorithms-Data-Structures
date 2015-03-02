@@ -13,11 +13,14 @@ import com.example.sort.GenericSortEngine;
 public class Main {
 	public static void main(String[] args) {
 		GenericSortEngine<Integer> engine = new GenericSortEngine<Integer>();
-		Integer array[] = new Integer[]{100, 101, 1, 70, 1, 13, 5, 0, 4, 1, 15, 8, 9};
-		engine.quickSort(array, GenericSortEngine.SortType.ASCENDING);
-		for (int k = 0; k < array.length; k++) {
-			System.out.print(array[k].toString() + "[" + k + "] ");
-		}
+		Integer firstArray[] = new Integer[]{1, 2, 3, 4, 5};
+		Integer secondArray[] = new Integer[]{2, 7, 8, 9};
+		engine.sortAndDistribute(firstArray, secondArray);
+		for (int i = 0; i < firstArray.length; i++)
+			System.out.print(firstArray[i] + " ");
+		System.out.println("");
+		for (int i = 0; i < secondArray.length; i++)
+			System.out.print(secondArray[i] + " ");
 
 //		GenericBinaryHeap<Integer> heap = new GenericBinaryHeap<Integer>(Type.MIN);
 //		heap.root = heap.new Element(1);

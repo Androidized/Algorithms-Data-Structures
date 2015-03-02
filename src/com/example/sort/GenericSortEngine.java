@@ -6,6 +6,60 @@ public class GenericSortEngine<T extends Comparable<? super T>> {
 		DESCENDING
 	}
 
+	class ArrayIterator {
+		T[] array;
+		int pointer;
+
+		ArrayIterator(T[] array) throws NullPointerException {
+			if (array == null) throw new NullPointerException();
+			this.array = array;
+			this.pointer = 0;
+		}
+
+		ArrayIterator(T[] array, int pointer)
+				throws NullPointerException, ArrayIndexOutOfBoundsException {
+			if (array == null)
+				throw new NullPointerException();
+			if (pointer < 0 || pointer > array.length - 1)
+				throw new ArrayIndexOutOfBoundsException();
+			this.array = array;
+			this.pointer = pointer;
+		}
+
+		public T setPointer(int pointer) throws ArrayIndexOutOfBoundsException {
+			if (pointer < 0 || pointer > this.array.length - 1) {
+				throw new ArrayIndexOutOfBoundsException();
+			} else {
+				this.pointer = pointer;
+				return this.array[pointer];
+			}
+		}
+
+		public int getPointer() {
+			return this.pointer;
+		}
+
+		public void setValue(T value) {
+			this.array[this.pointer] = value;
+		}
+
+		public T getValue() {
+			return this.array[this.pointer];
+		}
+
+		public boolean forward() {
+			if (this.pointer == this.array.length) return false;
+			this.pointer++;
+			return true;
+		}
+
+		public boolean backward() {
+			if (this.pointer == 0) return false;
+		    this.pointer--;
+		    return true;
+		}
+	}
+
 	public void insertionSort(T[] array, SortType sortType) {
 		T temp = null;
 		for (int i = 1; i < array.length; i++) {
@@ -90,5 +144,60 @@ public class GenericSortEngine<T extends Comparable<? super T>> {
 		array[i] = auxiliary;
 		System.out.println("Returning " + i);
 		return i;
+	}
+
+	/**
+	 * Given two sorted arrays, contents of the arrays are sorted
+	 * and distributed between the two, where the lower portion is
+	 * placed in the first one while the second portion is placed
+	 * in the second one.
+	 */
+	public void sortAndDistribute(T[] firstArray, T[] secondArray) {
+		ArrayIterator firstArrayIterator = new ArrayIterator(firstArray);
+		ArrayIterator secondArrayIterator = new ArrayIterator(secondArray);
+
+		T temp;
+		boolean finished = false;
+		while (finished) {
+			if (secondArrayIterator.getPointer() != 0) {
+				if (secondArray[0].compareTo(secondArrayIterator.getValue()) < 0) {
+					temp = firstArrayIterator.getValue();
+					firstArrayIterator.setValue(secondArray[0]);
+					finished = firstArrayIterator.forward();
+					shiftContentBlockTowardsHead(secondArray, 1,
+							secondArrayIterator.getPointer() - 1);
+					secondArray[secondArrayIterator.getPointer() - 1] = temp;
+				} else {
+					temp = secondArrayIterator.getValue();
+					secondArrayIterator.setValue(firstArrayIterator.getValue());
+					firstArrayIterator.setValue(temp);
+					finished = firstArrayIterator.forward();
+					finished &= secondArrayIterator.forward();
+				}
+			} else {
+				if (firstArrayIterator.getValue().compareTo(secondArrayIterator.getValue()) <= 0) {
+					finished = firstArrayIterator.forward();
+				} else {
+					temp = firstArrayIterator.getValue();
+					firstArrayIterator.setValue(secondArrayIterator.getValue());
+					secondArrayIterator.setValue(temp);
+					finished = firstArrayIterator.forward();
+					finished &= secondArrayIterator.forward();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Shift array's block of content, specified
+	 * by lower & upper bounds towards the head.
+	 */
+	private void shiftContentBlockTowardsHead(T[] array, int lowerBound, int upperBound)
+			throws IllegalArgumentException, ArrayIndexOutOfBoundsException {
+		if (lowerBound > upperBound) throw new IllegalArgumentException();
+		if (lowerBound < 0 || upperBound > array.length - 1)
+			throw new ArrayIndexOutOfBoundsException();
+		for (int i = lowerBound; i <= upperBound; i++)
+			array[i - lowerBound] = array[i];
 	}
 }
