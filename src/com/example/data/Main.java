@@ -7,12 +7,31 @@ import java.util.Set;
 import com.example.data.GenericBinaryHeap.Type;
 import com.example.data.Graph.Edge;
 import com.example.data.Graph.Vertex;
+import com.example.recursion.GenericRecursionEngine;
 import com.example.sort.GenericSortEngine;
 
 @SuppressWarnings("unused")
 public class Main {
 	public static void main(String[] args) {
-		GenericSortEngine<Integer> engine = new GenericSortEngine<Integer>();
+		
+		GenericRecursionEngine<Character> engine = new GenericRecursionEngine<Character>();
+		HashSet<Character> set = new HashSet<Character>();
+		set.add(new Character('A'));
+		set.add(new Character('B'));
+		set.add(new Character('C'));
+		set.add(new Character('D'));
+		HashSet<HashSet<Character>> allSubsets = engine.getSubsets(set);
+		
+		for (HashSet<Character> subset : allSubsets) {
+			System.out.print("Subset of size " + subset.size() + ": ");
+			for (Character ch : subset) {
+				System.out.print(ch + " ");
+			}
+			System.out.print("\n");
+		}
+		System.out.println("Size of all subsets: " + allSubsets.size());
+		
+//		GenericSortEngine<Integer> engine = new GenericSortEngine<Integer>();
 //		Integer firstArray[] = new Integer[]{1, 2, 3, 4, 5};
 //		Integer secondArray[] = new Integer[]{2, 3, 7, 8, 9};
 //		engine.sortAndDistribute(firstArray, secondArray);
@@ -21,10 +40,10 @@ public class Main {
 //		System.out.println("");
 //		for (int i = 0; i < secondArray.length; i++)
 //			System.out.print(secondArray[i] + " ");
-
-		StringBuilder builder = new StringBuilder();
-		builder.append("aba");
-		System.out.println(engine.anagramHashCode(builder));
+//
+//		StringBuilder builder = new StringBuilder();
+//		builder.append("aba");
+//		System.out.println(engine.anagramHashCode(builder));
 		
 //		long prime = 2;
 //		for (int i = 0; i < 100; i++) {
