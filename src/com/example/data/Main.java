@@ -13,15 +13,25 @@ import com.example.sort.GenericSortEngine;
 public class Main {
 	public static void main(String[] args) {
 		GenericSortEngine<Integer> engine = new GenericSortEngine<Integer>();
-		Integer firstArray[] = new Integer[]{1, 2, 3, 4, 5};
-		Integer secondArray[] = new Integer[]{2, 3, 7, 8, 9};
-		engine.sortAndDistribute(firstArray, secondArray);
-		for (int i = 0; i < firstArray.length; i++)
-			System.out.print(firstArray[i] + " ");
-		System.out.println("");
-		for (int i = 0; i < secondArray.length; i++)
-			System.out.print(secondArray[i] + " ");
+//		Integer firstArray[] = new Integer[]{1, 2, 3, 4, 5};
+//		Integer secondArray[] = new Integer[]{2, 3, 7, 8, 9};
+//		engine.sortAndDistribute(firstArray, secondArray);
+//		for (int i = 0; i < firstArray.length; i++)
+//			System.out.print(firstArray[i] + " ");
+//		System.out.println("");
+//		for (int i = 0; i < secondArray.length; i++)
+//			System.out.print(secondArray[i] + " ");
 
+		StringBuilder builder = new StringBuilder();
+		builder.append("aba");
+		System.out.println(engine.anagramHashCode(builder));
+		
+//		long prime = 2;
+//		for (int i = 0; i < 100; i++) {
+//			System.out.println(prime);
+//			prime = engine.findNextPrimeNumber(prime + 1);
+//		}
+		
 //		GenericBinaryHeap<Integer> heap = new GenericBinaryHeap<Integer>(Type.MIN);
 //		heap.root = heap.new Element(1);
 //		

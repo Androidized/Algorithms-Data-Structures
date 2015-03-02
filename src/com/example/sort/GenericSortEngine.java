@@ -1,5 +1,9 @@
 package com.example.sort;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 public class GenericSortEngine<T extends Comparable<? super T>> {
 	public enum SortType {
 		ASCENDING,
@@ -195,8 +199,8 @@ public class GenericSortEngine<T extends Comparable<? super T>> {
 	}
 
 	/**
-	 * Shift array's block of content, specified
-	 * by lower & upper bounds towards the head.
+	 * Shift an array's block of content, specified
+	 * by lower and upper bounds, towards the head.
 	 */
 	private void shiftContentBlockTowardsHead(T[] array, int lowerBound, int upperBound)
 			throws IllegalArgumentException, ArrayIndexOutOfBoundsException {
@@ -205,5 +209,58 @@ public class GenericSortEngine<T extends Comparable<? super T>> {
 			throw new ArrayIndexOutOfBoundsException();
 		for (int i = lowerBound; i <= upperBound; i++)
 			array[i - lowerBound] = array[i];
+	}
+
+	/**
+	 * Find and arrange anagrams given an array of strings.
+	 */
+	public void arrangeAnagrams(String[] array) {
+		
+	}
+
+	/**
+	 * Calculate a given anagram's hash code. 
+	 */
+	public long anagramHashCode(StringBuilder string) {
+		char ch;
+		long hashCode = 1;
+		long primeCode = 13;
+		Map<Character, Integer> hash = new HashMap<Character, Integer>();
+		for (int i = 0; i < string.length(); i++) {
+			ch = string.charAt(i);
+			if (hash.containsKey(ch)) {
+				hash.put(ch, hash.get(ch) + 1);
+			} else hash.put(ch, 1);
+		}
+
+		for (Entry<Character, Integer> entry : hash.entrySet()) {
+			primeCode = findNextPrimeNumber(primeCode + 1);
+			hashCode += Character.getNumericValue(entry.getKey()) * entry.getValue() * primeCode;
+		}
+
+		return hashCode;
+	}
+	
+	/**
+	 * Given an integer, find the next prime number. 
+	 */
+	public long findNextPrimeNumber(long number) {
+		if (isPrime(number)) return number;
+		long prime = number + 1;
+		for (long i = number; i < Math.pow(number, i); i++)
+			if (isPrime(i)) {
+				prime = i;
+				break;
+			}
+		return prime;
+	}
+
+	/**
+	 * Determine if a given number is prime.
+	 */
+	private boolean isPrime(long number) {
+		for (int i = 2; i <= (int) Math.sqrt(number); i++)
+			if (number % i == 0) return false; 
+		return true;
 	}
 }
