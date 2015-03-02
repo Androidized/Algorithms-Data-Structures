@@ -48,7 +48,7 @@ public class GenericSortEngine<T extends Comparable<? super T>> {
 		}
 
 		public boolean forward() {
-			if (this.pointer == this.array.length) return false;
+			if (this.pointer == this.array.length - 1) return false;
 			this.pointer++;
 			return true;
 		}
@@ -157,32 +157,38 @@ public class GenericSortEngine<T extends Comparable<? super T>> {
 		ArrayIterator secondArrayIterator = new ArrayIterator(secondArray);
 
 		T temp;
-		boolean finished = false;
-		while (finished) {
+		boolean unfinished = true;
+		boolean ignoreSubarray = true;
+		while (unfinished) {
 			if (secondArrayIterator.getPointer() != 0) {
 				if (secondArray[0].compareTo(secondArrayIterator.getValue()) < 0) {
 					temp = firstArrayIterator.getValue();
 					firstArrayIterator.setValue(secondArray[0]);
-					finished = firstArrayIterator.forward();
-					shiftContentBlockTowardsHead(secondArray, 1,
-							secondArrayIterator.getPointer() - 1);
+					unfinished = firstArrayIterator.forward();
+					if (secondArrayIterator.getPointer() > 1) {
+						shiftContentBlockTowardsHead(secondArray, 1,
+								secondArrayIterator.getPointer() - 1);
+						ignoreSubarray = false;
+					} else {
+						ignoreSubarray = true;
+					}
 					secondArray[secondArrayIterator.getPointer() - 1] = temp;
 				} else {
 					temp = secondArrayIterator.getValue();
 					secondArrayIterator.setValue(firstArrayIterator.getValue());
 					firstArrayIterator.setValue(temp);
-					finished = firstArrayIterator.forward();
-					finished &= secondArrayIterator.forward();
+					unfinished = firstArrayIterator.forward();
+					unfinished &= secondArrayIterator.forward();
 				}
-			} else {
+			} else if (secondArrayIterator.getPointer() == 0 || ignoreSubarray) {
 				if (firstArrayIterator.getValue().compareTo(secondArrayIterator.getValue()) <= 0) {
-					finished = firstArrayIterator.forward();
+					unfinished = firstArrayIterator.forward();
 				} else {
 					temp = firstArrayIterator.getValue();
 					firstArrayIterator.setValue(secondArrayIterator.getValue());
 					secondArrayIterator.setValue(temp);
-					finished = firstArrayIterator.forward();
-					finished &= secondArrayIterator.forward();
+					unfinished = firstArrayIterator.forward();
+					unfinished &= secondArrayIterator.forward();
 				}
 			}
 		}

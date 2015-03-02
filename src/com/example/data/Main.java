@@ -14,7 +14,7 @@ public class Main {
 	public static void main(String[] args) {
 		GenericSortEngine<Integer> engine = new GenericSortEngine<Integer>();
 		Integer firstArray[] = new Integer[]{1, 2, 3, 4, 5};
-		Integer secondArray[] = new Integer[]{2, 7, 8, 9};
+		Integer secondArray[] = new Integer[]{2, 3, 7, 8, 9};
 		engine.sortAndDistribute(firstArray, secondArray);
 		for (int i = 0; i < firstArray.length; i++)
 			System.out.print(firstArray[i] + " ");
