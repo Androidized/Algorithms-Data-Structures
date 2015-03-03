@@ -247,11 +247,12 @@ public class GenericSortEngine<T extends Comparable<? super T>> {
 	public long findNextPrimeNumber(long number) {
 		if (isPrime(number)) return number;
 		long prime = number + 1;
-		for (long i = number; i < Math.pow(number, i); i++)
+		for (long i = number; i < Math.pow(number, i); i++) {
 			if (isPrime(i)) {
 				prime = i;
 				break;
 			}
+		}
 		return prime;
 	}
 
