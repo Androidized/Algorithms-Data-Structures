@@ -43,4 +43,8 @@ public class Page {
 		}
 		return paragraphToReturn;
 	}
+
+	public int numberOfParagraphs() {
+		return this.paragraphs.size();
+	}
 }
