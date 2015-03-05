@@ -94,4 +94,16 @@ public class GenericRecursionEngine<T> {
             } else getPermutationsWithBag(tempRootString, tempMultiset, setOfPermutations);
         }
     }
+
+	public long swapInPlace(long value) {
+		int numberOfDigits = 0;
+		while ((int)(value / Math.pow(10, numberOfDigits)) != 0) numberOfDigits++;
+		int k = 0;
+		long result = value;
+		while (k < numberOfDigits) {
+			result += (value % Math.pow(10, k + 1) - value % Math.pow(10, k)) * Math.pow(10, 2 * (numberOfDigits - k) - 1);
+			k++;
+		}
+		return (long) (result / Math.pow(10, numberOfDigits));
+	}
 }

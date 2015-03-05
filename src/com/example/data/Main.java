@@ -14,30 +14,12 @@ import com.example.sort.GenericSortEngine;
 public class Main {
 	public static void main(String[] args) {
 		
-		GenericRecursionEngine<Character> engine = new GenericRecursionEngine<Character>();
-		StringBuilder string = new StringBuilder("string");
-		for (StringBuilder stringBuilder : engine.getPermutationsWithBag(string)) {
-			System.out.println(stringBuilder);
-		}
-//		HashSet<Character> set = new HashSet<Character>();
-//		set.add(new Character('A'));
-//		set.add(new Character('B'));
-//		set.add(new Character('C'));
-//		set.add(new Character('D'));
-//		HashSet<HashSet<Character>> allSubsets = engine.getSubsets(set);
-//		
-//		for (HashSet<Character> subset : allSubsets) {
-//			System.out.print("Subset of size " + subset.size() + ": ");
-//			for (Character ch : subset) {
-//				System.out.print(ch + " ");
-//			}
-//			System.out.print("\n");
-//		}
-//		System.out.println("Size of all subsets: " + allSubsets.size());
-//		
-//		HashSet<Character> anotherSet = new HashSet<Character>();
-		
-//		GenericSortEngine<Integer> engine = new GenericSortEngine<Integer>();
+		GenericRecursionEngine<Integer> recursionEngine = new GenericRecursionEngine<Integer>();
+		// System.out.println("Result is = " + engine.swapInPlace(123456789));
+
+		GenericSortEngine<Integer> sortEngine = new GenericSortEngine<Integer>();
+		int firstArray[] = new int[]{1, 2, -3, 2, 5, -3, -4, 5, 6, -7, 8, 9, 10};
+		sortEngine.segmentize(firstArray);
 //		Integer firstArray[] = new Integer[]{1, 2, 3, 4, 5};
 //		Integer secondArray[] = new Integer[]{2, 3, 7, 8, 9};
 //		engine.sortAndDistribute(firstArray, secondArray);

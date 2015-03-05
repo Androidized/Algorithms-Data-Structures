@@ -1,8 +1,10 @@
 package com.example.sort;
 
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 public class GenericSortEngine<T extends Comparable<? super T>> {
 	public enum SortType {
@@ -221,7 +223,7 @@ public class GenericSortEngine<T extends Comparable<? super T>> {
 	/**
 	 * Calculate a given anagram's hash code. 
 	 */
-	public long anagramHashCode(StringBuilder string) {
+	public static long anagramHashCode(StringBuilder string) {
 		char ch;
 		long hashCode = 1;
 		long primeCode = 13;
@@ -244,7 +246,7 @@ public class GenericSortEngine<T extends Comparable<? super T>> {
 	/**
 	 * Given an integer, find the next prime number. 
 	 */
-	public long findNextPrimeNumber(long number) {
+	public static long findNextPrimeNumber(long number) {
 		if (isPrime(number)) return number;
 		long prime = number + 1;
 		for (long i = number; i < Math.pow(number, i); i++) {
@@ -259,9 +261,74 @@ public class GenericSortEngine<T extends Comparable<? super T>> {
 	/**
 	 * Determine if a given number is prime.
 	 */
-	private boolean isPrime(long number) {
+	private static boolean isPrime(long number) {
 		for (int i = 2; i <= (int) Math.sqrt(number); i++)
 			if (number % i == 0) return false; 
 		return true;
+	}
+
+	/** 
+	 * Find pairs of elements, which sum up to a specified value, in a given sorted array. 
+	 */
+	public static void findComplements(int sum, int[] array) {
+		Map<Integer, Integer> hash = new HashMap<Integer, Integer>();
+		for (int i = 0; i < array.length; i++) {
+			hash.put(array[i], sum - array[i]);
+			if (hash.containsKey(sum - array[i]))
+				System.out.println("Complementary Elements: (" + array[i] + ", " + hash.get(array[i]) + ")");
+		}
+	}
+
+	/**
+	 * Returns a pseudo-random number between min and max, inclusive, where
+	 * the difference between min and max can be at most Integer.MAX_VALUE - 1.
+	 *
+	 * @param min Minimum value.
+	 * @param max Maximum value. Must be greater than min.
+	 * @return Integer between min and max, inclusive.
+	 * @see java.util.Random#nextInt(int)
+	 */
+	public static int randomInt(int min, int max) throws IllegalArgumentException {
+		if (min >= max) throw new IllegalArgumentException();
+
+	    // nextInt() is normally exclusive of the top value.
+	    // Therefore, add '1' to make it inclusive.
+		return new Random().nextInt(max - min + 1) + min;
+	}
+
+	public void segmentize(int[] array) {
+		Map<Integer, Map.Entry<Integer, Integer>> hash = new HashMap<Integer, Map.Entry<Integer, Integer>>();
+		int sum = 0;
+		int negativePointer = array[0] > 0 ? 0 : -1;
+		int positivePointer = array[0] <= 0 ? -1 : 0;
+		for (int i = 0; i < array.length; i++) {
+			if (i < array.length - 1) {
+				if (array[i] > 0 && array[i + 1] <= 0) {
+					sum += array[i];
+					hash.put(sum, new AbstractMap.SimpleEntry<Integer, Integer>(positivePointer, i));
+					negativePointer = i + 1;
+					positivePointer = -1;
+					sum = 0;
+				} else if (array[i] <= 0 && array[i + 1] > 0) {
+					sum += array[i];
+					hash.put(sum, new AbstractMap.SimpleEntry<Integer, Integer>(negativePointer, i));
+					positivePointer = i + 1;
+					negativePointer = -1;
+					sum = 0;
+				} else {
+					sum += array[i];
+				}
+			} else {
+				sum += array[i];
+				if (positivePointer != -1)
+					hash.put(sum, new AbstractMap.SimpleEntry<Integer, Integer>(positivePointer, i));
+				if (negativePointer != -1)
+					hash.put(sum, new AbstractMap.SimpleEntry<Integer, Integer>(negativePointer, i));
+			}
+		}
+		for (Integer integer : hash.keySet())
+			System.out.println("Segment Total Value: " + integer +
+					", begins: " + hash.get(integer).getKey() +
+					", ends: " + hash.get(integer).getValue());
 	}
 }
