@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
 
+import com.example.data.GenericBinaryTree;
 import com.example.numbers.RandomEngine;
 import com.example.recursion.GenericRecursionEngine;
 import com.example.sort.GenericSortEngine;
@@ -40,6 +41,24 @@ public class Main {
 //			System.out.println(prime);
 //			prime = engine.findNextPrimeNumber(prime + 1);
 //		}
+		
+		GenericBinaryTree<Integer> bt = new GenericBinaryTree<Integer>();
+		bt.root = bt.new Element(4);
+		bt.root.leftChild = bt.new Element(2);
+		bt.root.leftChild.leftChild = bt.new Element(1);
+		bt.root.leftChild.rightChild = bt.new Element(3);
+		bt.root.rightChild = bt.new Element(6);
+		bt.root.rightChild.leftChild = bt.new Element(5);
+		bt.root.rightChild.rightChild = bt.new Element(7);
+//		for (Integer i : bt.inOrderTraversal())
+//			System.out.print(i.toString() + ",");
+		
+		bt.convertBinaryTreeToLinkedListInOrderTraversal();
+		System.out.print(bt.root.leftChild.data.toString() + ",");
+		System.out.print(bt.root.data.toString() + ",");
+		System.out.print(bt.root.rightChild.data.toString() + ",");
+		System.out.print(bt.root.rightChild.rightChild.data.toString() + ",");
+		System.out.print(bt.root.rightChild.rightChild.rightChild.data.toString() + ",");
 		
 //		GenericBinaryHeap<Integer> heap = new GenericBinaryHeap<Integer>(Type.MIN);
 //		heap.root = heap.new Element(1);
