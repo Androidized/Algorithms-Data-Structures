@@ -1,25 +1,27 @@
-package com.example.data;
+package com.example.test;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Stack;
 
-import com.example.data.GenericBinaryHeap.Type;
-import com.example.data.Graph.Edge;
-import com.example.data.Graph.Vertex;
+import com.example.numbers.RandomEngine;
 import com.example.recursion.GenericRecursionEngine;
 import com.example.sort.GenericSortEngine;
 
 @SuppressWarnings("unused")
 public class Main {
 	public static void main(String[] args) {
-		
-		GenericRecursionEngine<Integer> recursionEngine = new GenericRecursionEngine<Integer>();
-		// System.out.println("Result is = " + engine.swapInPlace(123456789));
 
-		GenericSortEngine<Integer> sortEngine = new GenericSortEngine<Integer>();
-		int firstArray[] = new int[]{1, 2, -3, 2, 5, -3, -4, 5, 6, -7, 8, 9, 10};
-		sortEngine.segmentize(firstArray);
+		int firstArray[] = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+		RandomEngine.suffleInt(firstArray);
+		
+//		GenericRecursionEngine<Integer> recursionEngine = new GenericRecursionEngine<Integer>();
+//		// System.out.println("Result is = " + engine.swapInPlace(123456789));
+//
+//		GenericSortEngine<Integer> sortEngine = new GenericSortEngine<Integer>();
+//		int firstArray[] = new int[]{1, 2, -3, 2, 5, -3, -4, 5, 6, -7, 8, 9, 10};
+//		sortEngine.segmentize(firstArray);
 //		Integer firstArray[] = new Integer[]{1, 2, 3, 4, 5};
 //		Integer secondArray[] = new Integer[]{2, 3, 7, 8, 9};
 //		engine.sortAndDistribute(firstArray, secondArray);
