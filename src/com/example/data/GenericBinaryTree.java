@@ -100,11 +100,6 @@ public class GenericBinaryTree<T> {
 		Element previous = convertBinaryTreeToLinkedList(this.root.leftChild, RecursionDirection.LEFT);
 		Element next = convertBinaryTreeToLinkedList(this.root.rightChild, RecursionDirection.RIGHT);
 
-		System.out.print("Root: " + this.root.data.toString());
-		if (next != null) System.out.print(" next: " + next.data.toString());
-		if (previous != null) System.out.print(" previous: " + previous.data.toString());
-		System.out.print("\n");
-
 		this.root.leftChild = previous;
 		if (previous != null) previous.rightChild = this.root;
 		this.root.rightChild = next;
@@ -113,14 +108,10 @@ public class GenericBinaryTree<T> {
 
 	private Element convertBinaryTreeToLinkedList(Element root, RecursionDirection recursionDirection) {
 		if (root == null) return null;
+		if (root.leftChild == null && root.rightChild == null)	return root;
 
 		Element previous = convertBinaryTreeToLinkedList(root.leftChild, RecursionDirection.LEFT);
-		Element next = convertBinaryTreeToLinkedList(root.leftChild, RecursionDirection.RIGHT);
-
-		System.out.print("Root: " + root.data.toString());
-		if (next != null) System.out.print(" next: " + next.data.toString());
-		if (previous != null) System.out.print(" previous: " + previous.data.toString());
-		System.out.print("\n");
+		Element next = convertBinaryTreeToLinkedList(root.rightChild, RecursionDirection.RIGHT);
 
 		if (recursionDirection == RecursionDirection.LEFT) {
 			if (next == null) {
