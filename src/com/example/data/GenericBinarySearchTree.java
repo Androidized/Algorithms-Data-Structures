@@ -320,4 +320,22 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 		}
 		return current;
 	}
+
+	public static <T extends Comparable<? super T>>
+	    boolean verifyIfPostOrderTraversal(T[] postOrderTraversal) {
+		T root = postOrderTraversal[postOrderTraversal.length - 1];
+		int lowIndex = 0;
+		int highIndex = postOrderTraversal.length - 2;
+		int middleIndex;
+		while () {
+			middleIndex = (int) Math.floor((lowIndex + highIndex)/2);
+			if (postOrderTraversal[middleIndex].compareTo(root) < 0) {
+				lowIndex = middleIndex;
+			} else {
+				highIndex = middleIndex;
+			}
+		}
+
+		return verifyIfPostOrderTraversal() && verifyIfPostOrderTraversal();
+	}
 }

@@ -14,8 +14,8 @@ import com.example.sort.GenericSortEngine;
 public class Main {
 	public static void main(String[] args) {
 
-		int firstArray[] = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-		RandomEngine.suffleInt(firstArray);
+//		int firstArray[] = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+//		RandomEngine.suffleInt(firstArray);
 		
 //		GenericRecursionEngine<Integer> recursionEngine = new GenericRecursionEngine<Integer>();
 //		// System.out.println("Result is = " + engine.swapInPlace(123456789));
@@ -52,13 +52,13 @@ public class Main {
 		bt.root.rightChild.rightChild = bt.new Element(7);
 //		for (Integer i : bt.inOrderTraversal())
 //			System.out.print(i.toString() + ",");
-		
-		bt.convertBinaryTreeToLinkedListInOrderTraversal();
-		System.out.print(bt.root.leftChild.data.toString() + ",");
-		System.out.print(bt.root.data.toString() + ",");
-		System.out.print(bt.root.rightChild.data.toString() + ",");
-		System.out.print(bt.root.rightChild.rightChild.data.toString() + ",");
-		System.out.print(bt.root.rightChild.rightChild.rightChild.data.toString() + ",");
+		bt.findPathSumToValue(7);
+//		bt.convertBinaryTreeToLinkedListInOrderTraversal();
+//		System.out.print(bt.root.leftChild.data.toString() + ",");
+//		System.out.print(bt.root.data.toString() + ",");
+//		System.out.print(bt.root.rightChild.data.toString() + ",");
+//		System.out.print(bt.root.rightChild.rightChild.data.toString() + ",");
+//		System.out.print(bt.root.rightChild.rightChild.rightChild.data.toString() + ",");
 		
 //		GenericBinaryHeap<Integer> heap = new GenericBinaryHeap<Integer>(Type.MIN);
 //		heap.root = heap.new Element(1);

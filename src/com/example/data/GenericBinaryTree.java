@@ -139,4 +139,23 @@ public class GenericBinaryTree<T> {
 			}
 		}
 	}
+
+	public void findPathSumToValue(int value) {
+		if (this.root == null) return;
+		findPathSumToValue(value, (Number) this.root.data, this.root.leftChild);
+		findPathSumToValue(value, (Number) this.root.data, this.root.rightChild);
+	}
+
+	private void findPathSumToValue(int value, Number sum, Element child) {
+		sum = sum.intValue() + ((Number) child.data).intValue();
+		if (sum.intValue() == value) {
+			System.out.println("Sum of values from root to node " +
+		        child.data.toString() + " equls to " + value);
+		} else if (sum.intValue() < value) {
+			if (child.leftChild != null)
+				findPathSumToValue(value, sum, child.leftChild);
+			if (child.rightChild != null)
+				findPathSumToValue(value, sum, child.rightChild);
+		}
+	}
 }
