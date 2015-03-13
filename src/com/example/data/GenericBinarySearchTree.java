@@ -329,7 +329,6 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 	public static <T extends Comparable<? super T>> boolean
 	    isPostOrderTraversal(final T[] traversal, int low, int high) {
 		if (low == high || low == high - 1) return true;
-
 		T root = traversal[high];
 		int lowIndex = low;
 		int highIndex = high - 1;
@@ -352,7 +351,6 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 	public static <T extends Comparable<? super T>> boolean
 		isPreOrderTraversal(final T[] traversal, int low, int high) {
 		if (low == high || low == high - 1) return true;
-	
 		T root = traversal[low];
 		int lowIndex = low + 1;
 		int highIndex = high;
