@@ -321,21 +321,49 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 		return current;
 	}
 
-	public static <T extends Comparable<? super T>>
-	    boolean verifyIfPostOrderTraversal(T[] postOrderTraversal) {
-		T root = postOrderTraversal[postOrderTraversal.length - 1];
-		int lowIndex = 0;
-		int highIndex = postOrderTraversal.length - 2;
-		int middleIndex;
-		while () {
-			middleIndex = (int) Math.floor((lowIndex + highIndex)/2);
-			if (postOrderTraversal[middleIndex].compareTo(root) < 0) {
-				lowIndex = middleIndex;
-			} else {
-				highIndex = middleIndex;
-			}
-		}
-
-		return verifyIfPostOrderTraversal() && verifyIfPostOrderTraversal();
+	public static <T extends Comparable<? super T>> boolean
+	    isPostOrderTraversal(final T[] traversal) {
+		return isPostOrderTraversal(traversal, 0, traversal.length - 1);
 	}
+
+	public static <T extends Comparable<? super T>> boolean
+	    isPostOrderTraversal(final T[] traversal, int low, int high) {
+		if (low == high || low == high - 1) return true;
+
+		T root = traversal[high];
+		int lowIndex = low;
+		int highIndex = high - 1;
+		int i = highIndex;
+		while (i >= lowIndex && traversal[i].compareTo(root) > 0) i--;
+		if (i == lowIndex - 1) return isPostOrderTraversal(traversal, lowIndex, highIndex); 
+		int j = lowIndex;
+		while (j <= highIndex && traversal[j].compareTo(root) < 0) j++;
+		if (j == highIndex + 1) return isPostOrderTraversal(traversal, lowIndex, highIndex);
+		if (i != j - 1) return false;
+		else return isPostOrderTraversal(traversal, lowIndex, j - 1) &&
+				    isPostOrderTraversal(traversal, i + 1, highIndex);
+	}
+
+	public static <T extends Comparable<? super T>> boolean
+	    isPreOrderTraversal(final T[] traversal) {
+		return isPreOrderTraversal(traversal, 0, traversal.length - 1);
+	}
+
+	public static <T extends Comparable<? super T>> boolean
+		isPreOrderTraversal(final T[] traversal, int low, int high) {
+		if (low == high || low == high - 1) return true;
+	
+		T root = traversal[low];
+		int lowIndex = low + 1;
+		int highIndex = high;
+		int i = highIndex;
+		while (i >= lowIndex && traversal[i].compareTo(root) > 0) i--;
+		if (i == lowIndex - 1) return isPreOrderTraversal(traversal, lowIndex, highIndex); 
+		int j = lowIndex;
+		while (j <= highIndex && traversal[j].compareTo(root) < 0) j++;
+		if (j == highIndex + 1) return isPreOrderTraversal(traversal, lowIndex, highIndex);
+		if (i != j - 1) return false;
+		else return isPreOrderTraversal(traversal, lowIndex, j - 1) &&
+				    isPreOrderTraversal(traversal, i + 1, highIndex);
+    }
 }
