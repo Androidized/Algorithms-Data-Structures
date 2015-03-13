@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
 
+import com.example.data.GenericBinarySearchTree;
 import com.example.data.GenericBinaryTree;
 import com.example.numbers.RandomEngine;
 import com.example.recursion.GenericRecursionEngine;
@@ -14,7 +15,9 @@ import com.example.sort.GenericSortEngine;
 public class Main {
 	public static void main(String[] args) {
 
-//		int firstArray[] = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+		Integer[] firstArray = new Integer[]{4, 2, 1, 5, 6, 3, 7};
+		GenericBinarySearchTree<Integer> gbst = new GenericBinarySearchTree<Integer>();
+		System.out.println("Is pre-Order Traversal: " + gbst.isPreOrderTraversal(firstArray));
 //		RandomEngine.suffleInt(firstArray);
 		
 //		GenericRecursionEngine<Integer> recursionEngine = new GenericRecursionEngine<Integer>();
@@ -42,17 +45,17 @@ public class Main {
 //			prime = engine.findNextPrimeNumber(prime + 1);
 //		}
 		
-		GenericBinaryTree<Integer> bt = new GenericBinaryTree<Integer>();
-		bt.root = bt.new Element(4);
-		bt.root.leftChild = bt.new Element(2);
-		bt.root.leftChild.leftChild = bt.new Element(1);
-		bt.root.leftChild.rightChild = bt.new Element(3);
-		bt.root.rightChild = bt.new Element(6);
-		bt.root.rightChild.leftChild = bt.new Element(5);
-		bt.root.rightChild.rightChild = bt.new Element(7);
+//		GenericBinaryTree<Integer> bt = new GenericBinaryTree<Integer>();
+//		bt.root = bt.new Element(4);
+//		bt.root.leftChild = bt.new Element(2);
+//		bt.root.leftChild.leftChild = bt.new Element(1);
+//		bt.root.leftChild.rightChild = bt.new Element(3);
+//		bt.root.rightChild = bt.new Element(6);
+//		bt.root.rightChild.leftChild = bt.new Element(5);
+//		bt.root.rightChild.rightChild = bt.new Element(7);
 //		for (Integer i : bt.inOrderTraversal())
 //			System.out.print(i.toString() + ",");
-		bt.findPathSumToValue(7);
+		// bt.findPathSumToValue(7);
 //		bt.convertBinaryTreeToLinkedListInOrderTraversal();
 //		System.out.print(bt.root.leftChild.data.toString() + ",");
 //		System.out.print(bt.root.data.toString() + ",");

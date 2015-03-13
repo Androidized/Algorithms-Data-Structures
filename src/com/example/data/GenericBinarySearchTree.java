@@ -6,7 +6,7 @@ import java.util.Iterator;
 public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 	Node root;
 
-	GenericBinarySearchTree() {
+	public GenericBinarySearchTree() {
 		
 	}
 
@@ -321,13 +321,11 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 		return current;
 	}
 
-	public static <T extends Comparable<? super T>> boolean
-	    isPostOrderTraversal(final T[] traversal) {
+	public boolean isPostOrderTraversal(final T[] traversal) {
 		return isPostOrderTraversal(traversal, 0, traversal.length - 1);
 	}
 
-	public static <T extends Comparable<? super T>> boolean
-	    isPostOrderTraversal(final T[] traversal, int low, int high) {
+	private boolean isPostOrderTraversal(final T[] traversal, int low, int high) {
 		if (low == high || low == high - 1) return true;
 		T root = traversal[high];
 		int lowIndex = low;
@@ -343,13 +341,11 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 				    isPostOrderTraversal(traversal, i + 1, highIndex);
 	}
 
-	public static <T extends Comparable<? super T>> boolean
-	    isPreOrderTraversal(final T[] traversal) {
+	public boolean isPreOrderTraversal(final T[] traversal) {
 		return isPreOrderTraversal(traversal, 0, traversal.length - 1);
 	}
 
-	public static <T extends Comparable<? super T>> boolean
-		isPreOrderTraversal(final T[] traversal, int low, int high) {
+	private boolean isPreOrderTraversal(final T[] traversal, int low, int high) {
 		if (low == high || low == high - 1) return true;
 		T root = traversal[low];
 		int lowIndex = low + 1;
