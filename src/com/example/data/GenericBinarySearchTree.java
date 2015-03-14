@@ -493,8 +493,11 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 				        		  final T[] postOrderTraversal,
 				        		  int postOrderLow, int postOrderHigh) {
 
-		if (inOrderLow == inOrderHigh &&
+		if (bst != null &&
+			inOrderLow == inOrderHigh &&
 			postOrderLow == postOrderHigh &&
+			inOrderTraversal.length == 1 &&
+			postOrderTraversal.length == 1 &&
 			inOrderTraversal[inOrderLow]
 					.compareTo(postOrderTraversal[postOrderLow]) == 0) {
 			return bst.new Node(inOrderTraversal[inOrderLow]);

@@ -1,6 +1,7 @@
 package com.example.data;
 
 import java.util.EmptyStackException;
+import java.util.Stack;
 
 class GenericBinaryHeap<T extends Comparable<? super T>>{
 	enum Type {
@@ -100,7 +101,7 @@ class GenericBinaryHeap<T extends Comparable<? super T>>{
 
 		boolean continueToRight = false;
 		boolean pushedElementToStack = false;
-		GenericStack<Element> stack = new GenericStack<Element>();
+		Stack<Element> stack = new Stack<Element>();
 
 		do {
 			pushedElementToStack = false;
