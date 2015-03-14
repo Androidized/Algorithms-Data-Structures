@@ -19,7 +19,7 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 
 		Node(T data) {
 			this.data = data;
-			this.leftChild =null;
+			this.leftChild = null;
 			this.rightChild = null;
 		}
 
@@ -365,21 +365,24 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 
 	public void printLevelOrderTraversal() {
 		if (this.root == null) return;
-		Queue<Node> queue = new LinkedBlockingQueue<Node>();
-		queue.add(this.root);
-		while (!queue.isEmpty()) queue = doNextLevelOrderProcess(queue);
-	}
 
-	private Queue<Node> doNextLevelOrderProcess(Queue<Node> queue) {
-		Queue<Node> nextLevelChildren = new LinkedBlockingQueue<Node>();
+		Queue<Node> queue = new LinkedBlockingQueue<Node>();
+		queue.add(root);
+		queue.add(new Node(null)); // Enqueue delimiter
 		Node node = null;
-		while (!queue.isEmpty()) {
+		while (true) {
 			node = queue.remove();
-			nextLevelChildren.add(node.leftChild);
-			nextLevelChildren.add(node.rightChild);
-			System.out.print(node.data.toString() + ",");
+			if (node.data != null) {
+				System.out.println(node.data.toString() + ", ");
+				if (node.leftChild != null && node.leftChild.data != null)
+					queue.add(node.leftChild);
+				if (node.rightChild != null && node.rightChild.data != null)
+					queue.add(node.rightChild);
+			} else { // Dequeued delimiter
+				System.out.println("");
+				if (queue.isEmpty()) break;
+				else queue.add(node); // Re-enqueue delimiter
+			}
 		}
-		System.out.println("");
-		return nextLevelChildren;
 	}
 }
