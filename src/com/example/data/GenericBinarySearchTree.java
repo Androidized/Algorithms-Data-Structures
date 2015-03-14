@@ -1,7 +1,9 @@
 package com.example.data;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -313,14 +315,14 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 		return current.data;
 	}
 
-	public Node getNodeWithLowestData() {
+	public T getNodeWithLowestData() {
 		if (this.root == null) return null;
 
 		Node current = this.root;
 		while (current.leftChild != null) {
 			current = current.leftChild;
 		}
-		return current;
+		return current.data;
 	}
 
 	public boolean isPostOrderTraversal(final T[] traversal) {
@@ -329,15 +331,17 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 
 	private boolean isPostOrderTraversal(final T[] traversal, int low, int high) {
 		if (low == high || low == high - 1) return true;
-		T root = traversal[high];
+		T root = traversal[high]; // Rightmost element represents root
 		int lowIndex = low;
 		int highIndex = high - 1;
 		int i = highIndex;
 		while (i >= lowIndex && traversal[i].compareTo(root) > 0) i--;
-		if (i == lowIndex - 1) return isPostOrderTraversal(traversal, lowIndex, highIndex); 
+		if (i == lowIndex - 1)
+			return isPostOrderTraversal(traversal, lowIndex, highIndex); 
 		int j = lowIndex;
 		while (j <= highIndex && traversal[j].compareTo(root) < 0) j++;
-		if (j == highIndex + 1) return isPostOrderTraversal(traversal, lowIndex, highIndex);
+		if (j == highIndex + 1)
+			return isPostOrderTraversal(traversal, lowIndex, highIndex);
 		if (i != j - 1) return false;
 		else return isPostOrderTraversal(traversal, lowIndex, j - 1) &&
 				    isPostOrderTraversal(traversal, i + 1, highIndex);
@@ -349,15 +353,17 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 
 	private boolean isPreOrderTraversal(final T[] traversal, int low, int high) {
 		if (low == high || low == high - 1) return true;
-		T root = traversal[low];
+		T root = traversal[low]; // Leftmost element represents root
 		int lowIndex = low + 1;
 		int highIndex = high;
 		int i = highIndex;
 		while (i >= lowIndex && traversal[i].compareTo(root) > 0) i--;
-		if (i == lowIndex - 1) return isPreOrderTraversal(traversal, lowIndex, highIndex); 
+		if (i == lowIndex - 1)
+			return isPreOrderTraversal(traversal, lowIndex, highIndex); 
 		int j = lowIndex;
 		while (j <= highIndex && traversal[j].compareTo(root) < 0) j++;
-		if (j == highIndex + 1) return isPreOrderTraversal(traversal, lowIndex, highIndex);
+		if (j == highIndex + 1)
+			return isPreOrderTraversal(traversal, lowIndex, highIndex);
 		if (i != j - 1) return false;
 		else return isPreOrderTraversal(traversal, lowIndex, j - 1) &&
 				    isPreOrderTraversal(traversal, i + 1, highIndex);
@@ -384,5 +390,71 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 				else queue.add(node); // Re-enqueue delimiter
 			}
 		}
+	}
+
+	public T closestNodeToValue(T value) {
+		final List<T> inOrderTraversalList = inOrderTraversal();
+		if (inOrderTraversalList.size() == 0) return null;
+		T closestNodeToValue = inOrderTraversalList.get(0);
+		for (T element : inOrderTraversalList)
+			if (getDifference(value, element)
+					.compareTo(getDifference(value, closestNodeToValue)) < 0)
+				closestNodeToValue = element;
+		return closestNodeToValue;
+	}
+
+	private T getDifference(T firstValue, T secondValue) {
+		return null;
+	}
+
+	public List<T> preOrderTraversal() {
+		if (this.root == null) return null;
+		List<T> preOrderTraversalList = new ArrayList<T>();
+		preOrderTraversal(this.root, preOrderTraversalList);
+		return preOrderTraversalList;
+	}
+
+	private void preOrderTraversal(final Node root,
+			final List<T> preOrderTraversalList) {
+		if (root != null) preOrderTraversalList.add(root.data);
+		else return;
+		if (root.leftChild != null) preOrderTraversal(root.leftChild,
+				preOrderTraversalList);
+		if (root.rightChild != null) preOrderTraversal(root.rightChild,
+				preOrderTraversalList);
+	}
+
+	public List<T> postOrderTraversal() {
+		if (this.root == null) return null;
+		List<T> postOrderTraversalList = new ArrayList<T>();
+		postOrderTraversal(this.root, postOrderTraversalList);
+		return postOrderTraversalList;
+	}
+
+	private void postOrderTraversal(final Node root,
+			final List<T> postOrderTraversalList) {
+		if (root == null) return;
+		if (root.leftChild != null) postOrderTraversal(root.leftChild,
+				postOrderTraversalList);
+		if (root.rightChild != null) postOrderTraversal(root.rightChild,
+				postOrderTraversalList);
+		postOrderTraversalList.add(root.data);
+	}
+
+	public List<T> inOrderTraversal() {
+		if (this.root == null) return null;
+		List<T> inOrderTraversalList = new ArrayList<T>();
+		inOrderTraversal(this.root, inOrderTraversalList);
+		return inOrderTraversalList;
+	}
+
+	private void inOrderTraversal(final Node root,
+			final List<T> inOrderTraversalList) {
+		if (root == null) return;
+		if (root.leftChild != null) postOrderTraversal(root.leftChild,
+				inOrderTraversalList);
+		inOrderTraversalList.add(root.data);
+		if (root.rightChild != null) postOrderTraversal(root.rightChild,
+				inOrderTraversalList);
 	}
 }

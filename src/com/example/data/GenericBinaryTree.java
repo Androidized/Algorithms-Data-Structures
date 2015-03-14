@@ -3,7 +3,7 @@ package com.example.data;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GenericBinaryTree<T> {
+public class GenericBinaryTree<T extends Comparable<? super T>> {
 	public enum RecursionDirection {
 		LEFT,
 		RIGHT
@@ -28,12 +28,30 @@ public class GenericBinaryTree<T> {
 	}
 
 	public Element root;
+	private Element elementWithMinData;
+	private Element elementWithMaxData;
+
+	public Element getElementWithMinData() {
+		return this.elementWithMinData;
+	}
+
+	public Element getElementWithMaxData() {
+		return this.elementWithMaxData;
+	}
 
 	public T delete(T data) {
 		return null;
 	}
 
 	public void insert(T data) {
+		Element element = new Element(data);
+		if (this.elementWithMaxData.data.compareTo(data) < 0)
+			this.elementWithMaxData = element;
+		if (this.elementWithMinData.data.compareTo(data) > 0)
+			this.elementWithMinData = element;
+
+		// TODO: Add the new element to the tree
+
 		return;
 	}
 
@@ -106,12 +124,15 @@ public class GenericBinaryTree<T> {
 		if (next != null) next.leftChild = this.root;
 	}
 
-	private Element convertBinaryTreeToLinkedList(Element root, RecursionDirection recursionDirection) {
+	private Element convertBinaryTreeToLinkedList(Element root,
+			RecursionDirection recursionDirection) {
 		if (root == null) return null;
 		if (root.leftChild == null && root.rightChild == null)	return root;
 
-		Element previous = convertBinaryTreeToLinkedList(root.leftChild, RecursionDirection.LEFT);
-		Element next = convertBinaryTreeToLinkedList(root.rightChild, RecursionDirection.RIGHT);
+		Element previous = convertBinaryTreeToLinkedList(root.leftChild,
+				RecursionDirection.LEFT);
+		Element next = convertBinaryTreeToLinkedList(root.rightChild,
+				RecursionDirection.RIGHT);
 
 		if (recursionDirection == RecursionDirection.LEFT) {
 			if (next == null) {
