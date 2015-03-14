@@ -325,11 +325,13 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 		return current.data;
 	}
 
-	public boolean isPostOrderTraversal(final T[] traversal) {
+	public static <T extends Comparable<? super T>> boolean
+	    isPostOrderTraversal(final T[] traversal) {
 		return isPostOrderTraversal(traversal, 0, traversal.length - 1);
 	}
 
-	private boolean isPostOrderTraversal(final T[] traversal, int low, int high) {
+	private static <T extends Comparable<? super T>> boolean
+	    isPostOrderTraversal(final T[] traversal, int low, int high) {
 		if (low == high || low == high - 1) return true;
 		T root = traversal[high]; // Rightmost element represents root
 		int lowIndex = low;
@@ -347,11 +349,13 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 				    isPostOrderTraversal(traversal, i + 1, highIndex);
 	}
 
-	public boolean isPreOrderTraversal(final T[] traversal) {
+	public static <T extends Comparable<? super T>> boolean
+	    isPreOrderTraversal(final T[] traversal) {
 		return isPreOrderTraversal(traversal, 0, traversal.length - 1);
 	}
 
-	private boolean isPreOrderTraversal(final T[] traversal, int low, int high) {
+	private static <T extends Comparable<? super T>> boolean
+	    isPreOrderTraversal(final T[] traversal, int low, int high) {
 		if (low == high || low == high - 1) return true;
 		T root = traversal[low]; // Leftmost element represents root
 		int lowIndex = low + 1;
@@ -456,5 +460,64 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 		inOrderTraversalList.add(root.data);
 		if (root.rightChild != null) postOrderTraversal(root.rightChild,
 				inOrderTraversalList);
+	}
+
+	public static <T extends Comparable<? super T>> GenericBinarySearchTree<T>
+	    constructBinarySearchTree(final T[] inOrderTraversal, final T[] postOrderTraversal) {
+		if (inOrderTraversal.length == 0 ||
+			postOrderTraversal.length == 0 ||
+			inOrderTraversal.length != postOrderTraversal.length ||
+			!isPostOrderTraversal(postOrderTraversal) ||
+			!isInOrderTraversal(inOrderTraversal)) return null;
+
+		GenericBinarySearchTree<T> binarySearchTree = new GenericBinarySearchTree<T>();
+		binarySearchTree.root = binarySearchTree
+				.new Node(postOrderTraversal[postOrderTraversal.length - 1]);
+		int i;
+		for (i = 0; i < inOrderTraversal.length; i++)
+			if (inOrderTraversal[i].compareTo(binarySearchTree.root.data) == 0)
+				break;
+		binarySearchTree.root.leftChild = GenericBinarySearchTree
+				.constructBinarySearchTree(binarySearchTree, inOrderTraversal, 0, i - 1,
+						postOrderTraversal, 0, i - 1);
+		binarySearchTree.root.rightChild = GenericBinarySearchTree
+				.constructBinarySearchTree(binarySearchTree, inOrderTraversal, i + 1, inOrderTraversal.length - 1,
+						postOrderTraversal, i, postOrderTraversal.length - 2);
+		return binarySearchTree;
+	}
+
+	private static <T extends Comparable<? super T>> GenericBinarySearchTree<T>.Node
+        constructBinarySearchTree(final GenericBinarySearchTree<T> bst,
+        		                  final T[] inOrderTraversal,
+				        		  int inOrderLow, int inOrderHigh,
+				        		  final T[] postOrderTraversal,
+				        		  int postOrderLow, int postOrderHigh) {
+
+		if (inOrderLow == inOrderHigh &&
+			postOrderLow == postOrderHigh &&
+			inOrderTraversal[inOrderLow]
+					.compareTo(postOrderTraversal[postOrderLow]) == 0) {
+			return bst.new Node(inOrderTraversal[inOrderLow]);
+	    } else {
+			T rootData = postOrderTraversal[postOrderHigh];
+			int i;
+			for (i = inOrderLow; i <= inOrderHigh; i++)
+				if (inOrderTraversal[i].compareTo(rootData) == 0)
+					break;
+			GenericBinarySearchTree<T>.Node root = bst.new Node(rootData);
+			constructBinarySearchTree(bst, inOrderTraversal, inOrderLow, i - 1,
+					postOrderTraversal, postOrderLow, postOrderLow + i - inOrderLow - 1);
+			constructBinarySearchTree(bst, inOrderTraversal, i + 1, inOrderHigh,
+					postOrderTraversal, postOrderLow + i - inOrderLow, postOrderHigh - 1);
+			return root;
+		}
+	}
+
+	private static <T extends Comparable<? super T>> boolean
+	    isInOrderTraversal(T[] inOrderTraversal) {
+		for (int i = 0; i < inOrderTraversal.length - 2; i++)
+			if (inOrderTraversal[i].compareTo(inOrderTraversal[i + 1]) > 0)
+				return false;
+		return true;
 	}
 }
