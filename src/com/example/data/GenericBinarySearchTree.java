@@ -2,6 +2,8 @@ package com.example.data;
 
 import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 	Node root;
@@ -360,4 +362,24 @@ public class GenericBinarySearchTree<T extends Comparable<? super T>> {
 		else return isPreOrderTraversal(traversal, lowIndex, j - 1) &&
 				    isPreOrderTraversal(traversal, i + 1, highIndex);
     }
+
+	public void printLevelOrderTraversal() {
+		if (this.root == null) return;
+		Queue<Node> queue = new LinkedBlockingQueue<Node>();
+		queue.add(this.root);
+		while (!queue.isEmpty()) queue = doNextLevelOrderProcess(queue);
+	}
+
+	private Queue<Node> doNextLevelOrderProcess(Queue<Node> queue) {
+		Queue<Node> nextLevelChildren = new LinkedBlockingQueue<Node>();
+		Node node = null;
+		while (!queue.isEmpty()) {
+			node = queue.remove();
+			nextLevelChildren.add(node.leftChild);
+			nextLevelChildren.add(node.rightChild);
+			System.out.print(node.data.toString() + ",");
+		}
+		System.out.println("");
+		return nextLevelChildren;
+	}
 }
