@@ -8,5 +8,4 @@ public final class DebugHelper {
 			e.printStackTrace();
 		}
 	}
-
 }

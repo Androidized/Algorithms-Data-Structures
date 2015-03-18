@@ -2,6 +2,8 @@ package com.example.data;
 
 import java.util.EmptyStackException;
 
+import com.example.data.exception.EmptyQueueException;
+
 public final class GenericStackViaQueue<T> {
 	private GenericQueue<T> queue;
 

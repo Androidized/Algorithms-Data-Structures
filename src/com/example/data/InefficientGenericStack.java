@@ -1,5 +1,7 @@
 package com.example.data;
 
+import com.example.data.exception.EmptyDataStructureException;
+
 public class InefficientGenericStack<T extends Comparable<? super T>> {
 	private GenericSingleLinkedList<T> stack;
 	private static final boolean DBG = false;

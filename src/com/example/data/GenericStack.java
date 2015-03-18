@@ -33,6 +33,7 @@ public class GenericStack<T extends Comparable<? super T>> {
 
 	public synchronized void push(T data) throws NullPointerException {
 		if (data == null) throw new NullPointerException();
+
 		if (this.root == null) {
 			this.root = new Element(data);
 			this.root.next = this.root;
@@ -40,15 +41,15 @@ public class GenericStack<T extends Comparable<? super T>> {
 			this.root.max = this.root;
 		} else {
 			Element element = new Element(data, this.root.next);
-			if (data.compareTo(this.root.next.min.data) < 0)
+			this.root.next = element;
+			if (data.compareTo(element.next.min.data) < 0)
 				element.min = element;
 			else
-				element.min = this.root.next.min;
-			if (data.compareTo(this.root.next.max.data) > 0)
+				element.min = element.next.min;
+			if (data.compareTo(element.next.max.data) > 0)
 				element.max = element;
 			else
-				element.max = this.root.next.max;
-			this.root.next = element;
+				element.max = element.next.max;
 		}
 	}
 
@@ -56,12 +57,10 @@ public class GenericStack<T extends Comparable<? super T>> {
 		if (this.root == null) throw new EmptyStackException();
 
 		T data = this.root.next.data;
-
-		if (this.root.equals(this.root.next)) {
+		if (this.root.equals(this.root.next))
 			this.root = null;
-		} else {
+		else
 			this.root.next = this.root.next.next;			
-		}
 
 		return data;
 	}

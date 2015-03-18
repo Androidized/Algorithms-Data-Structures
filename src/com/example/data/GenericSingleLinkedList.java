@@ -1,5 +1,8 @@
 package com.example.data;
 
+import com.example.data.exception.EmptyDataStructureException;
+import com.example.data.exception.EmptyQueueException;
+
 public class GenericSingleLinkedList<T extends Comparable<? super T>> {
 	private Node root;
 	private Node nodeWithMinData;

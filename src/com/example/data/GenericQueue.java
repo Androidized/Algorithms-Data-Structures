@@ -1,5 +1,7 @@
 package com.example.data;
 
+import com.example.data.exception.EmptyQueueException;
+
 public class GenericQueue<T> {
 
 	class Element {
