@@ -39,42 +39,40 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 			for (int j = (int) Math.pow(2, i) - 1;
 				j < (int) Math.pow(2, i + 1) - 1;
 				j++) heapifyFromIndex(j, arrayOfElements);
-		return null;
+		return null; // TODO
 	}
 
 	private static <T extends Comparable<? super T>> void
 	    heapifyFromIndex(int j, final T[] arrayOfElements) {
-		if (j >= arrayOfElements.length - 1 ||
-			(2 * j) > arrayOfElements.length - 1) return;
+		if (j >= arrayOfElements.length - 1 || 2*j > arrayOfElements.length - 1)
+			return;
 
 		T temp;
-		if ((2 * j) <= arrayOfElements.length - 1 &&
-			(2 * j + 1) > arrayOfElements.length - 1) {
-			if (arrayOfElements[j].compareTo(arrayOfElements[2 * j]) > 0) {
+		if (2*j <= arrayOfElements.length - 1 &&
+			2*j + 1 > arrayOfElements.length - 1) {
+			if (arrayOfElements[j].compareTo(arrayOfElements[2*j]) > 0) {
 				temp = arrayOfElements[j];
-				arrayOfElements[j] = arrayOfElements[2 * j];
-				arrayOfElements[2 * j] = temp;
+				arrayOfElements[j] = arrayOfElements[2*j];
+				arrayOfElements[2*j] = temp;
 			}
 			return;
 		}
 
-		if ((2 * j) <= arrayOfElements.length - 1 &&
-			(2 * j + 1) <= arrayOfElements.length - 1) {
-			if (arrayOfElements[2 * j].compareTo(arrayOfElements[j]) <= 0 &&
-				arrayOfElements[2 * j].compareTo(arrayOfElements[2 * j + 1]) <= 0) {
+		if (2*j <= arrayOfElements.length - 1 &&
+			2*j + 1 <= arrayOfElements.length - 1) {
+			if (arrayOfElements[2*j].compareTo(arrayOfElements[j]) <= 0 &&
+				arrayOfElements[2*j].compareTo(arrayOfElements[2*j + 1]) <= 0) {
 				temp = arrayOfElements[j];
-				arrayOfElements[j] = arrayOfElements[2 * j];
-				arrayOfElements[2 * j] = temp;
-				heapifyFromIndex(2 * j, arrayOfElements);
-				return;
-			} else if (arrayOfElements[2 * j + 1].compareTo(arrayOfElements[j]) <= 0 &&
-				arrayOfElements[2 * j + 1].compareTo(arrayOfElements[2 * j]) <= 0) {
+				arrayOfElements[j] = arrayOfElements[2*j];
+				arrayOfElements[2*j] = temp;
+				heapifyFromIndex(2*j, arrayOfElements);
+			} else if (arrayOfElements[2*j + 1].compareTo(arrayOfElements[j]) <= 0 &&
+				arrayOfElements[2*j + 1].compareTo(arrayOfElements[2*j]) <= 0) {
 				temp = arrayOfElements[j];
-				arrayOfElements[j] = arrayOfElements[2 * j + 1];
-				arrayOfElements[2 * j + 1] = temp;
-				heapifyFromIndex(2 * j + 1, arrayOfElements);
-				return;
-			} else return;
+				arrayOfElements[j] = arrayOfElements[2*j + 1];
+				arrayOfElements[2*j + 1] = temp;
+				heapifyFromIndex(2*j + 1, arrayOfElements);
+			}
 		}			
 	}
 }
