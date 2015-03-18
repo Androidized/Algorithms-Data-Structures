@@ -13,6 +13,13 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 	}
 
 	class Element {
+
+		Element(T data, Element leftChild, Element rightChild) {
+			this.data = data;
+			this.leftChild = leftChild;
+			this.rightChild = rightChild;
+		}
+
 		T data;
 		Element leftChild;
 		Element rightChild;
@@ -30,6 +37,7 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <T extends Comparable<? super T>> GenericBinaryHeap<T>
 	    genericBinaryHeapFactory(final T[] arrayOfElements, HeapType heapType)
 	    		throws NullPointerException {
@@ -40,13 +48,34 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 			for (int j = (int) Math.pow(2, i) - 1;
 				j < (int) Math.pow(2, i + 1) - 1;
 				j++) heapifyFromIndex(j, arrayOfElements, heapType);
-		for (int i = 0; i < numberOfLevels; i++)
+
+		GenericBinaryHeap<T> genericBinaryHeap = new GenericBinaryHeap<T>(heapType);
+		GenericBinaryHeap<T>.Element[] arrayOfElementizedData =
+				(GenericBinaryHeap<T>.Element[]) new Object[arrayOfElements.length];
+
+		for (int j = (int) Math.pow(2, numberOfLevels) - 1; j < arrayOfElements.length; j++)
+			arrayOfElementizedData[j] = genericBinaryHeap
+					.new Element(arrayOfElements[j], null, null);
+		
+		for (int i = numberOfLevels - 1; i >= 0; i--)
 			for (int j = (int) Math.pow(2, i) - 1;
 				j < (int) Math.pow(2, i + 1) - 1;
 				j++) {
-				
+				if (2*j <= arrayOfElements.length - 2) {
+					arrayOfElementizedData[j] = genericBinaryHeap
+							.new Element(arrayOfElements[j],
+									arrayOfElementizedData[2*j],
+									arrayOfElementizedData[2*j + 1]);
+				} else if (2*j == arrayOfElements.length - 1) {
+					arrayOfElementizedData[j] = genericBinaryHeap
+							.new Element(arrayOfElements[j],
+									arrayOfElementizedData[2*j], null);
+				} else {
+					arrayOfElementizedData[j] = genericBinaryHeap
+							.new Element(arrayOfElements[j], null, null);
+				}
 			}
-		return null;
+		return genericBinaryHeap;
 	}
 
 	/**
