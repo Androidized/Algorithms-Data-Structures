@@ -28,15 +28,51 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 	private HeapType heapType;
 	private Element root;
 
-	public static <T extends Comparable<? super T>> GenericBinaryHeap<T>
-	    meld(GenericBinaryHeap<T> firstHeap, GenericBinaryHeap<T> secondHeap) {
+	public static <T extends Comparable<? super T>> int
+	    getNullPathLength(final GenericBinaryHeap<T>.Element heap) {
+		if (heap == null) return 0;
+		if (heap.leftChild == null || heap.rightChild == null) return 1;
+		return 1 + Math.min(getNullPathLength(heap.leftChild),
+				getNullPathLength(heap.rightChild));
+	}
+
+	/**
+	 * Merge two generic binary heaps. 
+	 */
+	public static <T extends Comparable<? super T>> GenericBinaryHeap<T>.Element
+	    meld(GenericBinaryHeap<T>.Element firstHeapRoot,
+	    		GenericBinaryHeap<T>.Element secondHeapRoot) {
+
+		// Edge cases
+		if (firstHeapRoot == null) return secondHeapRoot;
+		if (secondHeapRoot == null) return firstHeapRoot;
+
+		// Ensure the first heap is the one with
+		// root data value less than the second
+		if (firstHeapRoot.data.compareTo(secondHeapRoot.data) > 0) {
+			GenericBinaryHeap<T>.Element tempReference = firstHeapRoot;
+			firstHeapRoot = secondHeapRoot;
+			secondHeapRoot = tempReference;
+		}
+
+		// Meld the first binary heap's right sub-
+		// tree with the entire second binary heap
+		firstHeapRoot.rightChild = meld(firstHeapRoot.rightChild, secondHeapRoot);
 		return null;
 	}
 
+	/**
+	 * Merge the current generic binary heap
+	 * with the one specified as the argument. 
+	 */
 	public GenericBinaryHeap<T> meld(GenericBinaryHeap<T> otherHeap) {
 		return null;
 	}
 
+	/**
+	 * Factory method returning a generic binary heap given an
+	 * array of raw data elements and the specified heap type.  
+	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends Comparable<? super T>> GenericBinaryHeap<T>
 	    genericBinaryHeapFactory(final T[] arrayOfElements, HeapType heapType)
@@ -56,7 +92,7 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 		for (int j = (int) Math.pow(2, numberOfLevels) - 1; j < arrayOfElements.length; j++)
 			arrayOfElementizedData[j] = genericBinaryHeap
 					.new Element(arrayOfElements[j], null, null);
-		
+
 		for (int i = numberOfLevels - 1; i >= 0; i--)
 			for (int j = (int) Math.pow(2, i) - 1;
 				j < (int) Math.pow(2, i + 1) - 1;
