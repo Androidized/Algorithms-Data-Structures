@@ -1,7 +1,7 @@
 package com.example.data;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public final class RandomizedSkipList<T extends Comparable<? super T>> {
@@ -16,24 +16,24 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 	class Node {
 		T data;
 		int level;
-		List<Node> rightNeighbors;
+		Map<Integer, Node> rightNeighbors;
 
 		Node() {
 			this.data = null;
 			this.level = 0;
-			this.rightNeighbors = new ArrayList<Node>(1);
+			this.rightNeighbors = new HashMap<Integer, Node>(1);
 		}
 
 		Node(T data) {
 			this.data = data;
 			this.level = 0;
-			this.rightNeighbors = new ArrayList<Node>(1);
+			this.rightNeighbors = new HashMap<Integer, Node>(1);
 		}
 
 		Node(T data, int level) {
 			this.data = data;
 			this.level = level;
-			this.rightNeighbors = new ArrayList<Node>(level);
+			this.rightNeighbors = new HashMap<Integer, Node>(level);
 		}
 	}
 
@@ -63,8 +63,8 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 			// When the skip list is empty,
 			// do not randomize the insertion.
 			nodeToInsert = new Node(data);
-			this.header.rightNeighbors.add(nodeToInsert);
-			nodeToInsert.rightNeighbors.add(sentinel);
+			this.header.rightNeighbors.put(0, nodeToInsert);
+			nodeToInsert.rightNeighbors.put(-1, sentinel);
 			return;
 		}
 		while (true) {
@@ -79,18 +79,18 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 				Random rand = new Random();
 				while (rand.nextInt() > 0.5) i++;
 				nodeToInsert = new Node(data, i);
-				currentNode.rightNeighbors.set(0, nodeToInsert);
+				currentNode.rightNeighbors.put(0, nodeToInsert);
 				int newNodeCurrentLevel = 0;
 				while (newNodeCurrentLevel <= i) {
 					if (next.equals(this.sentinel)) {
 						while (newNodeCurrentLevel++ <= i)
-							nodeToInsert.rightNeighbors.add(this.sentinel);
+							nodeToInsert.rightNeighbors.put(-1, this.sentinel);
 						return;
 					}
 					if (newNodeCurrentLevel <= next.level) {
 						while (newNodeCurrentLevel <= i &&
 						       newNodeCurrentLevel <= next.level) {
-							nodeToInsert.rightNeighbors.add(next);
+							nodeToInsert.rightNeighbors.put(next.level, next);
 							newNodeCurrentLevel++;
 						}
 					}
