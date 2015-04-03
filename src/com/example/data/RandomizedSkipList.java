@@ -45,8 +45,8 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 		while (true) {
 			do {
 				nodeToCompare = currentNode.rightNeighbors.get(currentLevel--);
-				if (nodeToCompare.equals(sentinel)) return false;
-			} while (nodeToCompare.data.compareTo(data) > 0 &&
+			} while ((nodeToCompare.equals(sentinel) ||
+					 nodeToCompare.data.compareTo(data) > 0) &&
 					 currentLevel != -1);
 			if (currentLevel == -1) return false;
 			if (nodeToCompare.data.compareTo(data) == 0) return true;
@@ -103,7 +103,23 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 		}
 	}
 
-	public void delete(T dta) {
-		
+	public void delete(T data) {
+		Node nodeToCompare;
+		Node currentNode = this.header;
+		int currentLevel = this.header.rightNeighbors.size() - 1;
+		if (currentLevel == -1) return;
+		while (true) {
+			do {
+				nodeToCompare = currentNode.rightNeighbors.get(currentLevel--);
+			} while ((nodeToCompare.equals(sentinel) ||
+					 nodeToCompare.data.compareTo(data) > 0) &&
+					 currentLevel != -1);
+			if (currentLevel == -1) return;
+			if (nodeToCompare.data.compareTo(data) == 0) {
+				// TODO: Remove the node and link previous node to next.
+				return;
+			}
+			currentNode = nodeToCompare;
+		}
 	}
 }
