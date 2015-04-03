@@ -11,28 +11,28 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 	public RandomizedSkipList() {
 		this.header = new Node();
 		this.sentinel = new Node();
-	} 
+	}
 
 	class Node {
 		T data;
-		int level;
+		int level; // TODO: Possibly better off removing this
 		Map<Integer, Node> rightNeighbors;
 
 		Node() {
 			this.data = null;
-			this.level = 0;
-			this.rightNeighbors = new HashMap<Integer, Node>(1);
+			this.level = -1; // TODO: Possibly better off removing this
+			this.rightNeighbors = new HashMap<Integer, Node>();
 		}
 
 		Node(T data) {
 			this.data = data;
-			this.level = 0;
-			this.rightNeighbors = new HashMap<Integer, Node>(1);
+			this.level = -1; // TODO: Possibly better off removing this
+			this.rightNeighbors = new HashMap<Integer, Node>();
 		}
 
 		Node(T data, int level) {
 			this.data = data;
-			this.level = level;
+			this.level = level; // TODO: Possibly better off removing this
 			this.rightNeighbors = new HashMap<Integer, Node>(level);
 		}
 	}
@@ -40,18 +40,29 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 	public boolean find(T data) {
 		Node nodeToCompare;
 		Node currentNode = this.header;
-		int currentLevel = this.header.rightNeighbors.size() - 1;
+		int currentLevel = getHighestLevel(this.header.rightNeighbors);
 		if (currentLevel == -1) return false;
 		while (true) {
 			do {
-				nodeToCompare = currentNode.rightNeighbors.get(currentLevel--);
-			} while ((nodeToCompare.equals(sentinel) ||
-					 nodeToCompare.data.compareTo(data) > 0) &&
-					 currentLevel != -1);
-			if (currentLevel == -1) return false;
+				while (!currentNode.rightNeighbors.containsKey(currentLevel) &&
+						currentLevel != -1) currentLevel--;
+				if (currentLevel != -1)
+					nodeToCompare = currentNode.rightNeighbors.get(currentLevel--);
+				else return false;
+			} while (nodeToCompare.equals(sentinel) ||
+					 nodeToCompare.data.compareTo(data) > 0);
 			if (nodeToCompare.data.compareTo(data) == 0) return true;
 			currentNode = nodeToCompare;
 		}
+	}
+
+	private int getHighestLevel(final Map<Integer, Node> headerRightNeighbors) {
+		if (headerRightNeighbors.isEmpty()) return -1;
+		int highestLevel = 0;
+		for (Integer level : headerRightNeighbors.keySet()) {
+			if (highestLevel < level) highestLevel = level;
+		}
+		return highestLevel;
 	}
 
 	public void insert(T data) {
