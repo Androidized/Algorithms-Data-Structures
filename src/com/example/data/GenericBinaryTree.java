@@ -27,6 +27,14 @@ public class GenericBinaryTree<T extends Comparable<? super T>> {
 		}
 	}
 
+	public GenericBinaryTree() {
+		this.size = 0;
+		this.root = null;
+		this.elementWithMaxData = null;
+		this.elementWithMinData = null;
+	}
+
+	private int size;
 	public Element root;
 	private Element elementWithMinData;
 	private Element elementWithMaxData;
@@ -40,6 +48,9 @@ public class GenericBinaryTree<T extends Comparable<? super T>> {
 	}
 
 	public T delete(T data) {
+		// TODO: If deletion succeeds, decrement size.
+		// this.size--;
+
 		return null;
 	}
 
@@ -50,7 +61,9 @@ public class GenericBinaryTree<T extends Comparable<? super T>> {
 		if (this.elementWithMinData.data.compareTo(data) > 0)
 			this.elementWithMinData = element;
 
-		// TODO: Add the new element to the tree
+		// TODO: Add the new element to the tree.
+		// If insertion succeeds, increment size.
+		// this.size++;
 
 		return;
 	}
@@ -178,5 +191,34 @@ public class GenericBinaryTree<T extends Comparable<? super T>> {
 			if (child.rightChild != null)
 				findPathSumToValue(value, sum, child.rightChild);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public T[] serialize() {
+		if (this.root == null) return null;
+
+		T[] serializedTree = (T[]) new Object();
+		final List<T> serializedTreeAsList = new ArrayList<T>();
+		serializeTree(this.root, serializedTreeAsList);
+		for (int i = 0; i < serializedTreeAsList.size(); i++)
+			serializedTree[i] = serializedTreeAsList.get(i);
+		return serializedTree;
+	}
+
+	private void serializeTree(final Element rootOfTree, final List<T> serializedTreeAsList) {
+		if (rootOfTree != null) {
+			serializedTreeAsList.add(rootOfTree.data);
+			if (rootOfTree.leftChild != null) serializeTree(rootOfTree.leftChild, serializedTreeAsList);
+			if (rootOfTree.rightChild != null) serializeTree(rootOfTree.rightChild, serializedTreeAsList);
+			serializedTreeAsList.add(null); // Add a signature to indicate moving one level up in the tree.
+		} else return;
+	}
+
+	public GenericBinaryTree<T> deserialize(final T[] serializedTree) {
+		if (serializedTree == null) return null;
+
+		GenericBinaryTree<T> genericBinaryTree = new GenericBinaryTree<T>();
+		
+		return genericBinaryTree;
 	}
 }
