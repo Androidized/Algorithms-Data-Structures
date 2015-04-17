@@ -2,6 +2,7 @@ package com.example.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 public class GenericBinaryTree<T extends Comparable<? super T>> {
 	public enum RecursionDirection {
@@ -28,13 +29,11 @@ public class GenericBinaryTree<T extends Comparable<? super T>> {
 	}
 
 	public GenericBinaryTree() {
-		this.size = 0;
 		this.root = null;
 		this.elementWithMaxData = null;
 		this.elementWithMinData = null;
 	}
 
-	private int size;
 	public Element root;
 	private Element elementWithMinData;
 	private Element elementWithMaxData;
@@ -48,9 +47,6 @@ public class GenericBinaryTree<T extends Comparable<? super T>> {
 	}
 
 	public T delete(T data) {
-		// TODO: If deletion succeeds, decrement size.
-		// this.size--;
-
 		return null;
 	}
 
@@ -62,8 +58,6 @@ public class GenericBinaryTree<T extends Comparable<? super T>> {
 			this.elementWithMinData = element;
 
 		// TODO: Add the new element to the tree.
-		// If insertion succeeds, increment size.
-		// this.size++;
 
 		return;
 	}
@@ -208,16 +202,34 @@ public class GenericBinaryTree<T extends Comparable<? super T>> {
 	private void serializeTree(final Element rootOfTree, final List<T> serializedTreeAsList) {
 		if (rootOfTree != null) {
 			serializedTreeAsList.add(rootOfTree.data);
-			if (rootOfTree.leftChild != null) serializeTree(rootOfTree.leftChild, serializedTreeAsList);
-			if (rootOfTree.rightChild != null) serializeTree(rootOfTree.rightChild, serializedTreeAsList);
-			serializedTreeAsList.add(null); // Add a signature to indicate moving one level up in the tree.
+			if (rootOfTree.leftChild != null)
+				serializeTree(rootOfTree.leftChild, serializedTreeAsList);
+			if (rootOfTree.rightChild != null)
+				serializeTree(rootOfTree.rightChild, serializedTreeAsList);
+
+			// Add necessary signature to indicate
+			// moving one level up in binary tree.
+			serializedTreeAsList.add(null);
 		} else return;
 	}
 
-	public GenericBinaryTree<T> deserialize(final T[] serializedTree) {
+	public static <T extends Comparable<? super T>>
+	    GenericBinaryTree<T> deserialize(final T[] serializedTree) {
 		if (serializedTree == null) return null;
 
+		GenericBinaryTree<T>.Element child, parent;
 		GenericBinaryTree<T> genericBinaryTree = new GenericBinaryTree<T>();
+		final Stack<GenericBinaryTree<T>.Element> preOrderStack =
+				new Stack<GenericBinaryTree<T>.Element>();
+		for (int i = 0; i < serializedTree.length; i++) {
+			if (serializedTree[i] != null) {
+				preOrderStack.push(genericBinaryTree.new Element(serializedTree[i]));
+			} else {
+				child = preOrderStack.pop();
+				parent = preOrderStack.peek();
+				parent.leftChild = child;
+			}
+		}
 		
 		return genericBinaryTree;
 	}
