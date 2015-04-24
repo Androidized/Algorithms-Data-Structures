@@ -28,45 +28,53 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 	private HeapType heapType;
 	private Element root;
 
-	public static <T extends Comparable<? super T>> int
-	    getNullPathLength(final GenericBinaryHeap<T>.Element heap) {
-		if (heap == null) return 0;
-		if (heap.leftChild == null || heap.rightChild == null) return 1;
-		return 1 + Math.min(getNullPathLength(heap.leftChild),
-				getNullPathLength(heap.rightChild));
+	public int getNullPathLength() {
+		return getNullPathLength(this.root);
 	}
 
-	/**
-	 * Merge two generic binary heaps. 
-	 */
-	public static <T extends Comparable<? super T>> GenericBinaryHeap<T>.Element
-	    meld(GenericBinaryHeap<T>.Element firstHeapRoot,
-	    		GenericBinaryHeap<T>.Element secondHeapRoot) {
-
-		// Edge cases
-		if (firstHeapRoot == null) return secondHeapRoot;
-		if (secondHeapRoot == null) return firstHeapRoot;
-
-		// Ensure the first heap is the one with
-		// root data value less than the second
-		if (firstHeapRoot.data.compareTo(secondHeapRoot.data) > 0) {
-			GenericBinaryHeap<T>.Element tempReference = firstHeapRoot;
-			firstHeapRoot = secondHeapRoot;
-			secondHeapRoot = tempReference;
-		}
-
-		// Meld the first binary heap's right sub-
-		// tree with the entire second binary heap
-		firstHeapRoot.rightChild = meld(firstHeapRoot.rightChild, secondHeapRoot);
-		return null;
+	private int getNullPathLength(final Element heapRoot) {
+		if (heapRoot == null) return 0;
+		return 1 + Math.min(getNullPathLength(heapRoot.leftChild),
+				            getNullPathLength(heapRoot.rightChild));
 	}
 
 	/**
 	 * Merge the current generic binary heap
 	 * with the one specified as the argument. 
 	 */
-	public GenericBinaryHeap<T> meld(GenericBinaryHeap<T> otherHeap) {
-		return null;
+	public void meld(GenericBinaryHeap<T> other) {
+		if (other == null) return;
+		meld(this.root, other.root);
+	}
+
+	private Element meld(Element thisRoot, Element otherRoot) {
+
+		// Edge cases
+		if (otherRoot == null) return thisRoot;
+		if (thisRoot == null) return otherRoot;
+
+		// Ensure the first heap is the one with
+		// root data value less than the second
+		if (thisRoot.data.compareTo(otherRoot.data) > 0) {
+			Element tempRoot = thisRoot;
+			thisRoot = otherRoot;
+			otherRoot = tempRoot;
+		}
+
+		// Meld the first binary heap's right sub-
+		// tree with the entire second binary heap
+		thisRoot.rightChild = meld(thisRoot.rightChild, otherRoot);
+
+		// Ensure the resultant heap is more
+		// loaded towards on its left sub-tree
+		if (getNullPathLength(thisRoot.rightChild) >
+		    getNullPathLength(thisRoot.rightChild)) {
+			Element temp = thisRoot.rightChild;
+			thisRoot.rightChild = thisRoot.leftChild;
+			thisRoot.leftChild = temp;
+		}
+
+		return thisRoot.rightChild;
 	}
 
 	/**
