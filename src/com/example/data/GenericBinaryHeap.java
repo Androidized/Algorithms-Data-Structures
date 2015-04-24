@@ -28,6 +28,10 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 	private HeapType heapType;
 	private Element root;
 
+	public HeapType getType() {
+		return this.heapType;
+	}
+
 	public int getNullPathLength() {
 		return getNullPathLength(this.root);
 	}
@@ -67,14 +71,15 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 
 		// Ensure the resultant heap is more
 		// loaded towards on its left sub-tree
+		// by swapping the right & left sub-trees
 		if (getNullPathLength(thisRoot.rightChild) >
-		    getNullPathLength(thisRoot.rightChild)) {
-			Element temp = thisRoot.rightChild;
+		    getNullPathLength(thisRoot.leftChild)) {
+			Element tempChild = thisRoot.rightChild;
 			thisRoot.rightChild = thisRoot.leftChild;
-			thisRoot.leftChild = temp;
+			thisRoot.leftChild = tempChild;
 		}
 
-		return thisRoot.rightChild;
+		return thisRoot;
 	}
 
 	/**
@@ -87,11 +92,13 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 	    		throws NullPointerException {
 		if (arrayOfElements == null) throw new NullPointerException();
 
-		int numberOfLevels = (int) Math.floor(Math.log10(arrayOfElements.length) / Math.log10(2));
-		for (int i = numberOfLevels - 1; i >= 0; i--)
+		int numberOfLevels = logBaseTwo(arrayOfElements.length);
+
+		for (int i = numberOfLevels - 1; i >= 0; i--) {
 			for (int j = (int) Math.pow(2, i) - 1;
 				j < (int) Math.pow(2, i + 1) - 1;
 				j++) heapifyFromIndex(j, arrayOfElements, heapType);
+		}
 
 		GenericBinaryHeap<T> genericBinaryHeap = new GenericBinaryHeap<T>(heapType);
 		GenericBinaryHeap<T>.Element[] arrayOfElementizedData =
@@ -122,21 +129,26 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 		return genericBinaryHeap;
 	}
 
+	private static int logBaseTwo(int value) {
+		return (int) Math.floor(Math.log10(value) / Math.log10(2));
+	}
+
 	/**
-	 * Recursively heapify the sub-tree rooted at pseudo
-	 * node with data value equal to array's index "j".
+	 * Recursively heapify the heap rooted at node
+	 * with data value equal to array's index "j".
 	 */
 	private static <T extends Comparable<? super T>> void
 	    heapifyFromIndex(int j, final T[] arrayOfElements, HeapType heapType) {
 		T temp;
+		T tempRootData;
 
-		// Return if the sub-tree's root is the array's
-		// last element or falls off the array's boundary
+		// Return if the node is the array's last element or
+		// or both of its children fall off the array's boundary
 		if (j >= arrayOfElements.length - 1 ||
 			2*j > arrayOfElements.length - 1) return;
 
-		// Swap the sub-tree's root & its left child if necessary
-		// when the right child falls off the array's boundary.
+		// Swap the heap's root and its left child if necessary
+		// when the right child falls off the array's boundary
 		if (2*j == arrayOfElements.length - 1) {
 			if  ((heapType == HeapType.MIN &&
 				arrayOfElements[j].compareTo(arrayOfElements[2 * j]) > 0) ||
@@ -149,36 +161,29 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 			return;
 		}
 
-		// Heapify the topmost tree rooted at array's index "j" when the
-		// root, its left & right children all fall into the array boundary.
+		// Heapify the heap rooted at the array's index "j" when the
+		// root and its children all fall into the array boundary.
 		if (2*j <= arrayOfElements.length - 2) {
-			if ((heapType == HeapType.MIN &&
-				arrayOfElements[2*j].compareTo(arrayOfElements[j]) <= 0 &&
-				arrayOfElements[2*j].compareTo(arrayOfElements[2*j + 1]) <= 0) ||
-				(heapType == HeapType.MAX &&
-				arrayOfElements[2*j].compareTo(arrayOfElements[j]) >= 0 &&
-				arrayOfElements[2*j].compareTo(arrayOfElements[2*j + 1]) >= 0)) {
-				temp = arrayOfElements[j];
-				arrayOfElements[j] = arrayOfElements[2*j];
-				arrayOfElements[2*j] = temp;
-				// Continue with sub-tree rooted at left child
-				heapifyFromIndex(2*j, arrayOfElements, heapType);
-				return;
+			if (heapType == HeapType.MIN) {
+				temp = arrayOfElements[2*j].compareTo(arrayOfElements[2*j + 1]) < 0
+						? arrayOfElements[2*j] : arrayOfElements[2*j + 1];
+			} else {
+				temp = arrayOfElements[2*j].compareTo(arrayOfElements[2*j + 1]) > 0
+						? arrayOfElements[2*j] : arrayOfElements[2*j + 1];
 			}
 
-			if ((heapType == HeapType.MIN &&
-				arrayOfElements[2*j + 1].compareTo(arrayOfElements[j]) <= 0 &&
-				arrayOfElements[2*j + 1].compareTo(arrayOfElements[2*j]) <= 0) ||
-				(heapType == HeapType.MAX &&
-				arrayOfElements[2*j + 1].compareTo(arrayOfElements[j]) >= 0 &&
-				arrayOfElements[2*j + 1].compareTo(arrayOfElements[2*j]) >= 0)) {
-				temp = arrayOfElements[j];
-				arrayOfElements[j] = arrayOfElements[2*j + 1];
-				arrayOfElements[2*j + 1] = temp;
-				// Continue with sub-tree rooted at right child
+			// Swap the root's data with
+			// the candidate child.
+			tempRootData = arrayOfElements[j];
+			arrayOfElements[j] = temp;
+			temp = tempRootData;
+
+			// Continue with the relevant heap
+			// rooted at the candidate child.
+			if (temp.equals(arrayOfElements[2*j]))
+				heapifyFromIndex(2*j, arrayOfElements, heapType);
+			if (temp.equals(arrayOfElements[2*j + 1]))
 				heapifyFromIndex(2*j + 1, arrayOfElements, heapType);
-				return;
-			}
 		}
 	}
 }
