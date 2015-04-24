@@ -148,23 +148,28 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 		return (int) Math.floor(Math.log10(value) / Math.log10(2));
 	}
 
+	private static <T extends Comparable<? super T>> void
+	    heapifyFromIndex(int j, final T[] arrayOfElements, HeapType heapType) {
+		heapifyFromIndex(j, arrayOfElements, arrayOfElements.length, heapType);
+	}
+
 	/**
 	 * Recursively heapify the heap rooted at node
 	 * with data value equal to array's index "j".
 	 */
 	private static <T extends Comparable<? super T>> void
-	    heapifyFromIndex(int j, final T[] arrayOfElements, HeapType heapType) {
+	    heapifyFromIndex(int j, final T[] arrayOfElements,
+	    		         int upperIndex, HeapType heapType) {
 		T temp;
 		T tempRootData;
 
 		// Return if the node is the array's last element or
-		// or both of its children fall off the array's boundary
-		if (j >= arrayOfElements.length - 1 ||
-			2*j > arrayOfElements.length - 1) return;
+		// or both of its children fall off specified boundary
+		if (j >= upperIndex || 2*j > upperIndex) return;
 
 		// Swap the heap's root and its left child if necessary
 		// when the right child falls off the array's boundary
-		if (2*j == arrayOfElements.length - 1) {
+		if (2*j == upperIndex) {
 			if  ((heapType == HeapType.MIN &&
 				arrayOfElements[j].compareTo(arrayOfElements[2 * j]) > 0) ||
 				(heapType == HeapType.MAX &&
@@ -178,7 +183,7 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 
 		// Heapify the heap rooted at the array's index "j" when the
 		// root and its children all fall into the array boundary.
-		if (2*j <= arrayOfElements.length - 2) {
+		if (2*j <= upperIndex - 1) {
 			if (heapType == HeapType.MIN) {
 				temp = arrayOfElements[2*j].compareTo(arrayOfElements[2*j + 1]) < 0
 						? arrayOfElements[2*j] : arrayOfElements[2*j + 1];
@@ -196,9 +201,9 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 			// Continue with the relevant heap
 			// rooted at the candidate child.
 			if (temp.equals(arrayOfElements[2*j]))
-				heapifyFromIndex(2*j, arrayOfElements, heapType);
+				heapifyFromIndex(2*j, arrayOfElements, upperIndex, heapType);
 			if (temp.equals(arrayOfElements[2*j + 1]))
-				heapifyFromIndex(2*j + 1, arrayOfElements, heapType);
+				heapifyFromIndex(2*j + 1, arrayOfElements, upperIndex, heapType);
 		}
 	}
 
