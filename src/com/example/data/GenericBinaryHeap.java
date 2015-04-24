@@ -10,6 +10,8 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 	GenericBinaryHeap(HeapType heapType) {
 		this.heapType = heapType;
 		this.root = null;
+		this.size = 0;
+		this.internalArray = null;
 	}
 
 	class Element {
@@ -27,6 +29,8 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 
 	private HeapType heapType;
 	private Element root;
+	private int size;
+	private T[] internalArray;
 
 	public HeapType getType() {
 		return this.heapType;
@@ -89,43 +93,24 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 	@SuppressWarnings("unchecked")
 	public static <T extends Comparable<? super T>> GenericBinaryHeap<T>
 	    genericBinaryHeapFactory(final T[] arrayOfElements, HeapType heapType)
-	    		throws NullPointerException {
-		if (arrayOfElements == null) throw new NullPointerException();
+	    		throws IllegalArgumentException {
+		if (arrayOfElements == null || arrayOfElements[0] != null)
+			throw new IllegalArgumentException();
 
 		int numberOfLevels = logBaseTwo(arrayOfElements.length);
 
 		for (int i = numberOfLevels - 1; i >= 0; i--) {
-			for (int j = (int) Math.pow(2, i) - 1;
-				j < (int) Math.pow(2, i + 1) - 1;
+			for (int j = (int) Math.pow(2, i);
+				j < (int) Math.pow(2, i + 1);
 				j++) heapifyFromIndex(j, arrayOfElements, heapType);
 		}
 
 		GenericBinaryHeap<T> genericBinaryHeap = new GenericBinaryHeap<T>(heapType);
-		GenericBinaryHeap<T>.Element[] arrayOfElementizedData =
-				(GenericBinaryHeap<T>.Element[]) new Object[arrayOfElements.length];
-
-		for (int j = (int) Math.pow(2, numberOfLevels) - 1; j < arrayOfElements.length; j++)
-			arrayOfElementizedData[j] = genericBinaryHeap
-					.new Element(arrayOfElements[j], null, null);
-
-		for (int i = numberOfLevels - 1; i >= 0; i--)
-			for (int j = (int) Math.pow(2, i) - 1;
-				j < (int) Math.pow(2, i + 1) - 1;
-				j++) {
-				if (2*j <= arrayOfElements.length - 2) {
-					arrayOfElementizedData[j] = genericBinaryHeap
-							.new Element(arrayOfElements[j],
-									arrayOfElementizedData[2*j],
-									arrayOfElementizedData[2*j + 1]);
-				} else if (2*j == arrayOfElements.length - 1) {
-					arrayOfElementizedData[j] = genericBinaryHeap
-							.new Element(arrayOfElements[j],
-									arrayOfElementizedData[2*j], null);
-				} else {
-					arrayOfElementizedData[j] = genericBinaryHeap
-							.new Element(arrayOfElements[j], null, null);
-				}
-			}
+		genericBinaryHeap.size = arrayOfElements.length - 1;
+		genericBinaryHeap.internalArray = (T[]) new Object[arrayOfElements.length];
+		for (int i = 0; i < arrayOfElements.length; i++) {
+			genericBinaryHeap.internalArray[i] = arrayOfElements[i];
+		}
 		return genericBinaryHeap;
 	}
 
