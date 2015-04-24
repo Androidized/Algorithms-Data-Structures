@@ -93,7 +93,9 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 	public static <T extends Comparable<? super T>> GenericBinaryHeap<T>
 	    genericBinaryHeapFactory(final T[] arrayOfElements, HeapType heapType)
 	    		throws IllegalArgumentException {
-		if (arrayOfElements == null || arrayOfElements[0] != null)
+		if (arrayOfElements == null ||    // Array cannot be null
+			arrayOfElements[0] != null || // Array's first element must be null
+			arrayOfElements.length < 2)   // Array cannot be empty if not null
 			throw new IllegalArgumentException();
 
 		int numberOfLevels = logBaseTwo(arrayOfElements.length);
@@ -107,6 +109,9 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 		GenericBinaryHeap<T> genericBinaryHeap = new GenericBinaryHeap<T>(heapType);
 		GenericQueue<GenericBinaryHeap<T>.Element> breathFirstSearchQueue =
 				new GenericQueue<GenericBinaryHeap<T>.Element>();
+		genericBinaryHeap.size = arrayOfElements.length - 1;
+		// By convention, the array's first element is
+		// null so the actual data begins at index "1"
 		int i = 1;
 		GenericBinaryHeap<T>.Element element;
 		genericBinaryHeap.root = genericBinaryHeap.new Element(arrayOfElements[i], null, null);
@@ -128,7 +133,7 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 				e.printStackTrace();
 			}
 		}
-		genericBinaryHeap.size = arrayOfElements.length - 1;
+
 		return genericBinaryHeap;
 	}
 
