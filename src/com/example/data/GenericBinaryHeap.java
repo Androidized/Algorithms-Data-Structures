@@ -13,6 +13,7 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 		this.heapType = heapType;
 		this.root = null;
 		this.size = 0;
+		this.internalArray = null;
 	}
 
 	class Element {
@@ -31,6 +32,7 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 	private HeapType heapType;
 	private Element root;
 	private int size;
+	private T[] internalArray;
 
 	public HeapType getType() {
 		return this.heapType;
@@ -90,6 +92,7 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 	 * Factory method returning a generic binary heap given an
 	 * array of raw data elements and the specified heap type.  
 	 */
+	@SuppressWarnings("unchecked")
 	public static <T extends Comparable<? super T>> GenericBinaryHeap<T>
 	    genericBinaryHeapFactory(final T[] arrayOfElements, HeapType heapType)
 	    		throws IllegalArgumentException {
@@ -110,6 +113,10 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 		GenericQueue<GenericBinaryHeap<T>.Element> breathFirstSearchQueue =
 				new GenericQueue<GenericBinaryHeap<T>.Element>();
 		genericBinaryHeap.size = arrayOfElements.length - 1;
+		genericBinaryHeap.internalArray = (T[]) new Object[arrayOfElements.length];
+		for (int j = 0; j < arrayOfElements.length; j++) {
+			genericBinaryHeap.internalArray[j] = arrayOfElements[j];
+		}
 		// By convention, the array's first element is
 		// null so the actual data begins at index "1"
 		int i = 1;
@@ -193,5 +200,59 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 			if (temp.equals(arrayOfElements[2*j + 1]))
 				heapifyFromIndex(2*j + 1, arrayOfElements, heapType);
 		}
+	}
+
+	/**
+	 * Return the minimum (or the maximum)
+	 * element depending on the heap type.
+	 */
+	public T findMinMax() {
+		return this.root.data;
+	}
+
+	/**
+	 * Delete the minimum (or the maximum)
+	 * element depending on the heap type. 
+	 */
+	public T deleteMinMax() {
+		T temp;
+		T theMinMax = this.root.data;
+		this.root.data = this.internalArray[this.size--];
+		heapifyFromIndex(1, this.internalArray, this.heapType); // O(logN)
+		Element currentElement = this.root;
+		Element elementToHeapify = null;
+		do {
+			if (this.heapType == HeapType.MIN) {
+				if (currentElement.leftChild != null &&
+					currentElement.rightChild != null) {
+					elementToHeapify = currentElement.leftChild.data.compareTo(
+							currentElement.rightChild.data) < 0 ?
+									currentElement.leftChild :
+									currentElement.rightChild; 
+				} else if (currentElement.leftChild != null &&
+						   currentElement.rightChild == null) {
+					elementToHeapify = currentElement.leftChild;
+				} else elementToHeapify = null;
+			}
+			if (this.heapType == HeapType.MAX) {
+				if (currentElement.leftChild != null &&
+					currentElement.rightChild != null) {
+					elementToHeapify = currentElement.leftChild.data.compareTo(
+							currentElement.rightChild.data) > 0 ?
+									currentElement.leftChild :
+									currentElement.rightChild; 
+				} else if (currentElement.leftChild != null &&
+						   currentElement.rightChild == null) {
+					elementToHeapify = currentElement.leftChild;
+				} else elementToHeapify = null;
+			}
+			if (elementToHeapify != null) {
+				temp = currentElement.data;
+				currentElement.data = elementToHeapify.data;
+				elementToHeapify.data = temp;
+			}
+			currentElement = elementToHeapify;
+		} while (currentElement != null); // O(logN)
+		return theMinMax;
 	}
 }
