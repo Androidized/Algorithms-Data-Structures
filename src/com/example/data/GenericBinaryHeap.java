@@ -1,5 +1,7 @@
 package com.example.data;
 
+import com.example.data.exception.EmptyQueueException;
+
 public class GenericBinaryHeap<T extends Comparable<? super T>> {
 
 	enum HeapType {
@@ -11,7 +13,6 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 		this.heapType = heapType;
 		this.root = null;
 		this.size = 0;
-		this.internalArray = null;
 	}
 
 	class Element {
@@ -30,7 +31,6 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 	private HeapType heapType;
 	private Element root;
 	private int size;
-	private T[] internalArray;
 
 	public HeapType getType() {
 		return this.heapType;
@@ -90,7 +90,6 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 	 * Factory method returning a generic binary heap given an
 	 * array of raw data elements and the specified heap type.  
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T extends Comparable<? super T>> GenericBinaryHeap<T>
 	    genericBinaryHeapFactory(final T[] arrayOfElements, HeapType heapType)
 	    		throws IllegalArgumentException {
@@ -106,11 +105,30 @@ public class GenericBinaryHeap<T extends Comparable<? super T>> {
 		}
 
 		GenericBinaryHeap<T> genericBinaryHeap = new GenericBinaryHeap<T>(heapType);
-		genericBinaryHeap.size = arrayOfElements.length - 1;
-		genericBinaryHeap.internalArray = (T[]) new Object[arrayOfElements.length];
-		for (int i = 0; i < arrayOfElements.length; i++) {
-			genericBinaryHeap.internalArray[i] = arrayOfElements[i];
+		GenericQueue<GenericBinaryHeap<T>.Element> breathFirstSearchQueue =
+				new GenericQueue<GenericBinaryHeap<T>.Element>();
+		int i = 1;
+		GenericBinaryHeap<T>.Element element;
+		genericBinaryHeap.root = genericBinaryHeap.new Element(arrayOfElements[i], null, null);
+		breathFirstSearchQueue.write(genericBinaryHeap.root);
+		while (!breathFirstSearchQueue.isEmpty()) {
+			try {
+				element = breathFirstSearchQueue.read();
+				if (i < arrayOfElements.length - 1 &&
+					arrayOfElements[++i] != null) {
+					element.leftChild = genericBinaryHeap.new Element(arrayOfElements[i], null, null);
+					breathFirstSearchQueue.write(element.leftChild);
+				}
+				if (i < arrayOfElements.length - 1 &&
+					arrayOfElements[++i] != null) {
+					element.rightChild = genericBinaryHeap.new Element(arrayOfElements[i], null, null);
+					breathFirstSearchQueue.write(element.rightChild);
+				}
+			} catch (EmptyQueueException e) {
+				e.printStackTrace();
+			}
 		}
+		genericBinaryHeap.size = arrayOfElements.length - 1;
 		return genericBinaryHeap;
 	}
 
