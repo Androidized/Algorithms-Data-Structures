@@ -3,114 +3,99 @@ package com.example.data;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 public final class RandomizedSkipList<T extends Comparable<? super T>> {
-	Node header;
-	Node sentinel;
+	private Node header;
+	private Node sentinel;
+	int listLevel;
 
 	public RandomizedSkipList() {
-		this.header = new Node();
-		this.sentinel = new Node();
+		this.header = new Node(null, -1);
+		this.sentinel = new Node(null, -1);
+		this.listLevel = 0;
 	}
 
 	class Node {
 		T data;
-		int level; // TODO: Possibly better off removing this
+		int level;
 		Map<Integer, Node> rightNeighbors;
-
-		Node() {
-			this.data = null;
-			this.level = -1; // TODO: Possibly better off removing this
-			this.rightNeighbors = new HashMap<Integer, Node>();
-		}
-
-		Node(T data) {
-			this.data = data;
-			this.level = -1; // TODO: Possibly better off removing this
-			this.rightNeighbors = new HashMap<Integer, Node>();
-		}
 
 		Node(T data, int level) {
 			this.data = data;
-			this.level = level; // TODO: Possibly better off removing this
-			this.rightNeighbors = new HashMap<Integer, Node>(level);
+			this.level = level;
+			this.rightNeighbors = new HashMap<Integer, Node>();
 		}
 	}
 
-	public boolean find(T data) {
-		Node nodeToCompare;
+	public NodeEntry<Boolean, Node> find(T data) {
+		Node nodeToCompare = null;
+
+		// Return false if there is nothing in the list.
+		if (this.listLevel == 0) return new NodeEntry<Boolean, Node>(false, null);
+
+		// Begin with the header.
 		Node currentNode = this.header;
-		int currentLevel = getHighestLevel(this.header.rightNeighbors);
-		if (currentLevel == -1) return false;
-		while (true) {
-			do {
-				while (!currentNode.rightNeighbors.containsKey(currentLevel) &&
-						currentLevel != -1) currentLevel--;
-				if (currentLevel != -1)
-					nodeToCompare = currentNode.rightNeighbors.get(currentLevel--);
-				else return false;
-			} while (nodeToCompare.equals(sentinel) ||
-					 nodeToCompare.data.compareTo(data) > 0);
-			if (nodeToCompare.data.compareTo(data) == 0) return true;
-			currentNode = nodeToCompare;
-		}
-	}
+		int currentLevel = this.listLevel;
 
-	private int getHighestLevel(final Map<Integer, Node> headerRightNeighbors) {
-		if (headerRightNeighbors.isEmpty()) return -1;
-		int highestLevel = 0;
-		for (Integer level : headerRightNeighbors.keySet()) {
-			if (highestLevel < level) highestLevel = level;
+		while (currentLevel > 0) {
+			nodeToCompare = currentNode.rightNeighbors.get(currentLevel);
+			if (nodeToCompare != null) {
+				if (data.compareTo(nodeToCompare.data) > 0) {
+					currentNode = nodeToCompare;
+				} else if (data.compareTo(nodeToCompare.data) < 0) {
+					currentLevel--;
+				} else return new NodeEntry<Boolean, Node>(true, nodeToCompare);
+			} else currentLevel--;
 		}
-		return highestLevel;
-	}
 
-	public void insert(T data) {
-		Node nodeToInsert;
-		Node nodeToCompare;
-		Node currentNode = this.header;
-		int currentLevel = this.header.rightNeighbors.size() - 1;
-		if (currentLevel == -1) {
-			// When the skip list is empty,
-			// do not randomize the insertion.
-			nodeToInsert = new Node(data);
-			this.header.rightNeighbors.put(0, nodeToInsert);
-			nodeToInsert.rightNeighbors.put(-1, sentinel);
-			return;
-		}
-		while (true) {
-			do {
-				nodeToCompare = currentNode.rightNeighbors.get(currentLevel--);
-			} while ((nodeToCompare.equals(sentinel) ||
-					 nodeToCompare.data.compareTo(data) > 0) &&
-					 currentLevel != -1);
-			if (currentLevel == -1) {
-				Node next = currentNode.rightNeighbors.get(0);
-				int i = 0;
-				Random rand = new Random();
-				while (rand.nextInt() > 0.5) i++;
-				nodeToInsert = new Node(data, i);
-				currentNode.rightNeighbors.put(0, nodeToInsert);
-				int newNodeCurrentLevel = 0;
-				while (newNodeCurrentLevel <= i) {
-					if (next.equals(this.sentinel)) {
-						while (newNodeCurrentLevel++ <= i)
-							nodeToInsert.rightNeighbors.put(-1, this.sentinel);
-						return;
+		// Return the node immediately before the possible
+		// position where the data could have been found.
+		// This can be used for inserting a new node to the
+		// list containing the same data value as the query.
+		return new NodeEntry<Boolean, Node>(false, currentNode);
+	}
+	
+	public Node insert(T data) {
+		NodeEntry<Boolean, Node> entry = find(data);
+		if (entry.getKey()) return entry.getValue();
+		else {
+
+			// Create the node to be inserted into the list.
+			Node leftNeighbor = entry.getValue();
+			Random rand = new Random(2 * this.listLevel - 1);
+			Node nodeToInsert = new Node(data, rand.nextInt() + 1);
+
+			if (leftNeighbor.level > nodeToInsert.level) {
+				nodeToInsert.rightNeighbors.put(1, leftNeighbor.rightNeighbors.get(1));
+				nodeToInsert.rightNeighbors.put(nodeToInsert.level, leftNeighbor.rightNeighbors.get(1));
+				for (int leftNeighborLevelPointer : leftNeighbor.rightNeighbors.keySet()) {
+					if (leftNeighborLevelPointer <= nodeToInsert.level) {
+						leftNeighbor.rightNeighbors.remove(leftNeighborLevelPointer);
 					}
-					if (newNodeCurrentLevel <= next.level) {
-						while (newNodeCurrentLevel <= i &&
-						       newNodeCurrentLevel <= next.level) {
-							nodeToInsert.rightNeighbors.put(next.level, next);
-							newNodeCurrentLevel++;
-						}
-					}
-					next = next.rightNeighbors.get(0);
 				}
-				return;
+				leftNeighbor.rightNeighbors.put(1, nodeToInsert);
+				leftNeighbor.rightNeighbors.put(nodeToInsert.level, nodeToInsert);
+			} else {
+				nodeToInsert.rightNeighbors.put(1, leftNeighbor.rightNeighbors.get(1));
+				leftNeighbor.rightNeighbors.clear();
+				leftNeighbor.rightNeighbors.put(1, nodeToInsert);
+				leftNeighbor.rightNeighbors.put(leftNeighbor.level, nodeToInsert);
 			}
-			if (nodeToCompare.data.compareTo(data) == 0) return;
-			currentNode = nodeToCompare;
+
+			// Update left neighbor(s) of inserted node to point to it.
+			int levelToUpdateFrom = 1;
+			if (leftNeighbor.level <= nodeToInsert.level) {
+				levelToUpdateFrom = leftNeighbor.level;
+			} else {
+				levelToUpdateFrom = nodeToInsert.level;
+			}
+			for (int i = levelToUpdateFrom; i > 0; i--) {
+				nodeToInsert.rightNeighbors.put(i, leftNeighbor.rightNeighbors.get(i));
+				leftNeighbor.rightNeighbors.put(i, nodeToInsert);
+			}
+
+			return nodeToInsert;
 		}
 	}
 
