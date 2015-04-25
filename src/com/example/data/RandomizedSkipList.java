@@ -12,6 +12,7 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 	public RandomizedSkipList() {
 		this.header = new Node(null, -1);
 		this.sentinel = new Node(null, -1);
+		this.header.rightNeighbors.put(1, this.sentinel);
 		this.listLevel = 0;
 	}
 
@@ -30,9 +31,8 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 	public NodeEntry<Boolean, Node> find(T data) {
 		Node nodeToCompare = null;
 
-		// Return false if there is nothing in the list.
 		if (this.listLevel == 0)
-			return new NodeEntry<Boolean, Node>(false, null);
+			return new NodeEntry<Boolean, Node>(false, this.header);
 
 		// Begin with the header.
 		Node currentNode = this.header;
@@ -75,11 +75,12 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 			// Create the new node to be inserted into the list.
 			if (this.listLevel == 0) {
 				nodeToInsert = new Node(data, 1);
+				nodeToInsert.rightNeighbors.put(1, this.sentinel);
 			} else {
 				Random rand = new Random(2 * this.listLevel - 1);
 				nodeToInsert = new Node(data, rand.nextInt() + 1);
 				nodeToInsert.rightNeighbors
-				.put(1, leftNeighbor.rightNeighbors.get(1));
+					.put(1, leftNeighbor.rightNeighbors.get(1));
 				// Ensure the inserted node points to a right-hand
 				// neighbor, whose level is greater than or equal
 				// to that of the inserted node.
@@ -147,11 +148,9 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 					}
 				}
 			}
-
 			if (this.listLevel < nodeToInsert.level) {
 				this.listLevel = nodeToInsert.level;
 			}
-
 			return nodeToInsert;
 		}
 	}
