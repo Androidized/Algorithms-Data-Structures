@@ -106,10 +106,16 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 			// the immediate left neighbor of the yet to be
 			// inserted node. 
 			leftNeighbor = entry.getValue();
-			// Create the new node to be inserted into the list.
-			if (this.listLevel == 0) {
+			if (leftNeighbor.equals(this.header)) {
+				// Set the level of the first inserted node
+				// to the list to "1". Let the header point
+				// to this node, while letting this node point
+				// to the sentinel.
 				nodeToInsert = new Node(data, 1);
 				nodeToInsert.rightNeighbors.put(1, this.sentinel);
+				this.header.rightNeighbors.put(nodeToInsert.level, nodeToInsert);
+				this.header.rightNeighbors.put(1, nodeToInsert);
+				return nodeToInsert;
 			} else {
 				Random rand = new Random(2 * this.listLevel - 1);
 				nodeToInsert = new Node(data, rand.nextInt() + 1);
@@ -182,8 +188,12 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 					}
 				}
 			}
+
+			// If the added node is has the highest,
+			// level let the header point to it, too.
 			if (this.listLevel < nodeToInsert.level) {
 				this.listLevel = nodeToInsert.level;
+				this.header.rightNeighbors.put(nodeToInsert.level, nodeToInsert);
 			}
 			return nodeToInsert;
 		}
@@ -226,3 +236,4 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 		}
 	}
 }
+
