@@ -195,7 +195,7 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 								lastNodeTraversedDown = currentNode;
 								currentLevel--;
 							} else {
-								
+								return nodeToInsert;
 							}
 						} else currentLevel--;
 					}
