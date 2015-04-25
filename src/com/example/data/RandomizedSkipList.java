@@ -10,9 +10,15 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 	private int listLevel;
 
 	public RandomizedSkipList() {
+		// Set both header and sentinel's level to "-1".
+		// Set both header and sentinel's data to null.
 		this.header = new Node(null, -1);
 		this.sentinel = new Node(null, -1);
+		// Let header point to sentinel when the list is empty.
+		// When the last node is removed from the list, let the
+		// header point to sentinel again.
 		this.header.rightNeighbors.put(1, this.sentinel);
+		// An empty list has always a level equal to "0".
 		this.listLevel = 0;
 	}
 
@@ -29,16 +35,22 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 	}
 
 	public NodeEntry<Boolean, Node> find(T data) {
-		Node nodeToCompare = null;
 
+		// Return if the list is empty.
 		if (this.listLevel == 0)
+			// Return the header as the second parameter
+			// to indicate that the returned false was
+			// as the result of querying the data to an
+			// empty list.
 			return new NodeEntry<Boolean, Node>(false, this.header);
 
-		// Begin with the header.
+		// Begin with the header and traverse the list
+		// using the right pointers at each visited node.
 		Node currentNode = this.header;
+		Node nodeToCompare = null;
+		Node leftNeighbor = null;
 		int currentLevel = this.listLevel;
-
-		while (currentLevel > 0) {
+		while (currentLevel > 1) {
 			nodeToCompare = currentNode.rightNeighbors.get(currentLevel);
 			if (nodeToCompare != null) {
 				if (data.compareTo(nodeToCompare.data) > 0) {
@@ -50,15 +62,37 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 			} else currentLevel--;
 		}
 
-		// Return the node immediately before the possible
-		// position where the data could have been found.
-		// This can be used for inserting a new node to the
-		// list containing the same data value as the query.
-		return new NodeEntry<Boolean, Node>(false, currentNode);
+		// After hitting the bottom of the list, continue
+		// traversing the remaining nodes until the last
+		// visited node's data value is found equal to or
+		// greater than the query.
+		while (!currentNode.equals(this.sentinel)) {
+			if (currentNode.data.compareTo(data) > 0) {
+				// Return the node immediately before the possible
+				// position where the data could have been found.
+				// This can be used for inserting a new node to the
+				// list containing the same data value as the query.
+				return new NodeEntry<Boolean, Node>(false, leftNeighbor);
+			} else if (currentNode.data.compareTo(data) < 0) {
+				// This is where we enter this while loop,
+				// so we protect ourselves from losing the
+				// track of the immediate left neighbor.
+				leftNeighbor = currentNode;
+				currentNode = currentNode.rightNeighbors.get(1);
+			} else {
+				return new NodeEntry<Boolean, Node>(true, currentNode);
+			}
+		}
+
+		// After reaching the sentinel, return the last node
+		// in the list as the position where the data may be
+		// inserted into the list.
+		return new NodeEntry<Boolean, Node>(false, leftNeighbor);
 	}
 
 	public Node insert(T data) {
 		int currentLevel;
+		Node leftNeighbor;
 		Node currentNode;
 		Node nodeToInsert;
 		Node nodeToCompare;
@@ -71,7 +105,7 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 			// Get a handle to the node that is going to be
 			// the immediate left neighbor of the yet to be
 			// inserted node. 
-			Node leftNeighbor = entry.getValue();
+			leftNeighbor = entry.getValue();
 			// Create the new node to be inserted into the list.
 			if (this.listLevel == 0) {
 				nodeToInsert = new Node(data, 1);
@@ -156,22 +190,39 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 	}
 
 	public void delete(T data) {
-		Node nodeToCompare;
-		Node currentNode = this.header;
-		int currentLevel = this.header.rightNeighbors.size() - 1;
-		if (currentLevel == -1) return;
-		while (true) {
-			do {
-				nodeToCompare = currentNode.rightNeighbors.get(currentLevel--);
-			} while ((nodeToCompare.equals(sentinel) ||
-					 nodeToCompare.data.compareTo(data) > 0) &&
-					 currentLevel != -1);
-			if (currentLevel == -1) return;
-			if (nodeToCompare.data.compareTo(data) == 0) {
-				// TODO: Remove the node and link previous node to next.
-				return;
+		NodeEntry<Boolean, Node> entry = find(data);
+		if (!entry.getKey()) return;
+		else {
+			Node nodeToRemove = null;
+			Node nodeToCompare = null;
+			Node leftNeighbor = this.header;
+			Node currentNode = this.header;
+			int currentLevel = this.listLevel;
+			while (currentLevel > 0) {
+				do {
+					nodeToCompare = currentNode.rightNeighbors.get(currentLevel--);
+				} while ((nodeToCompare.equals(sentinel) ||
+						 nodeToCompare.data.compareTo(data) > 0) &&
+						 currentLevel != -1);
+				if (currentLevel == -1) break;
+				if (nodeToCompare.data.compareTo(data) == 0) {
+					// TODO: Remove the node and link previous node to next.
+					break;
+				}
+				currentNode = nodeToCompare;
 			}
-			currentNode = nodeToCompare;
+
+			if (nodeToRemove != null &&
+				leftNeighbor.equals(this.header) &&
+				nodeToRemove.rightNeighbors.get(1).equals(this.sentinel)) {
+				this.header.rightNeighbors.put(1, this.sentinel);
+				// Reset the list level to "0" only when
+				// it becomes empty. Tracking the list
+				// level in cases other than this particular
+				// scenario is rather complex, which is
+				// avoided purposely.
+				this.listLevel = 0;
+			}
 		}
 	}
 }
