@@ -1,15 +1,13 @@
 package com.example.data;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 public final class RandomizedSkipList<T extends Comparable<? super T>> {
 	private Node header;
 	private Node sentinel;
-	int listLevel;
+	private int listLevel;
 
 	public RandomizedSkipList() {
 		this.header = new Node(null, -1);
@@ -62,7 +60,7 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 		Node currentNode;
 		Node nodeToInsert;
 		Node nodeToCompare;
-		Node lastNodeTraversedDown;
+		Node lastNodeTraversedDown = null;
 		NodeEntry<Boolean, Node> entry = find(data);
 		// Return the node that has identical
 		// data value as the input argument.
@@ -87,9 +85,13 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 			int lowestLevelPointed = -1;
 			while (!currentNode.equals(sentinel)) {
 				if (currentNode.level >= nodeToInsert.level) {
+					// This is a blocking right-hand neighbor, thus,
+					// update the inserted node's pointer and break.
 					nodeToInsert.rightNeighbors.put(nodeToInsert.level, currentNode);
 					break;
 				} else {
+					// If this is a non-blocking right-hand neighbor,
+					// update the inserted node's pointer but continue.
 					if (lowestLevelPointed == -1 ||
 						lowestLevelPointed < currentNode.level) {
 						lowestLevelPointed = currentNode.level;
@@ -114,8 +116,8 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 				leftNeighbor.rightNeighbors.clear();
 				leftNeighbor.rightNeighbors.put(1, nodeToInsert);
 				leftNeighbor.rightNeighbors.put(leftNeighbor.level, nodeToInsert);
-				// Update nodes before the left neighbor to have
-				// references to the inserted node if necessary.
+				// Update all nodes before the left neighbor to have
+				// proper pointers to the inserted node if necessary.
 				currentNode = this.header;
 				currentLevel = this.listLevel;
 				while (currentLevel > 1) {
@@ -129,6 +131,18 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 						}
 					} else currentLevel--;
 				}
+				if (lastNodeTraversedDown != null) {
+					for (int i = nodeToInsert.level; i > 1; i--) {
+						nodeToCompare = lastNodeTraversedDown.rightNeighbors.get(i);
+						if (nodeToCompare != null && nodeToCompare.data.compareTo(data) >= 0) {
+							lastNodeTraversedDown.rightNeighbors
+								.put(nodeToInsert.level, nodeToInsert);
+						}
+					}
+				}
+			}
+			if (this.listLevel < nodeToInsert.level) {
+				this.listLevel = nodeToInsert.level;
 			}
 
 			return nodeToInsert;
