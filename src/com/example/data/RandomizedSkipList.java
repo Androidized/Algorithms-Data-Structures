@@ -31,7 +31,8 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 		Node nodeToCompare = null;
 
 		// Return false if there is nothing in the list.
-		if (this.listLevel == 0) return new NodeEntry<Boolean, Node>(false, null);
+		if (this.listLevel == 0)
+			return new NodeEntry<Boolean, Node>(false, null);
 
 		// Begin with the header.
 		Node currentNode = this.header;
@@ -44,7 +45,8 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 					currentNode = nodeToCompare;
 				} else if (data.compareTo(nodeToCompare.data) < 0) {
 					currentLevel--;
-				} else return new NodeEntry<Boolean, Node>(true, nodeToCompare);
+				} else
+					return new NodeEntry<Boolean, Node>(true, nodeToCompare);
 			} else currentLevel--;
 		}
 
@@ -71,76 +73,81 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 			// inserted node. 
 			Node leftNeighbor = entry.getValue();
 			// Create the new node to be inserted into the list.
-			Random rand = new Random(2 * this.listLevel - 1);
-			nodeToInsert = new Node(data, rand.nextInt() + 1);
-			nodeToInsert.rightNeighbors
-				.put(1, leftNeighbor.rightNeighbors.get(1));
-			// Ensure the inserted node points to a right-hand
-			// neighbor, whose level is greater than or equal
-			// to that of the inserted node.
-			currentNode = nodeToInsert;
-			// This is to ensure whatever level smaller than
-			// that of the inserted node is encountered will
-			// be recorded.
-			int lowestLevelPointed = -1;
-			while (!currentNode.equals(sentinel)) {
-				if (currentNode.level >= nodeToInsert.level) {
-					// This is a blocking right-hand neighbor, thus,
-					// update the inserted node's pointer and break.
-					nodeToInsert.rightNeighbors.put(nodeToInsert.level, currentNode);
-					break;
-				} else {
-					// If this is a non-blocking right-hand neighbor,
-					// update the inserted node's pointer but continue.
-					if (lowestLevelPointed == -1 ||
-						lowestLevelPointed < currentNode.level) {
-						lowestLevelPointed = currentNode.level;
-						nodeToInsert.rightNeighbors.put(currentNode.level, currentNode);
-					}
-				}
-				currentNode = currentNode.rightNeighbors.get(1);
-			}
-			// Ensure the immediately left-hand neighbor
-			// correctly points to the inserted node.
-			if (leftNeighbor.level >= nodeToInsert.level) {
-				for (int leftNeighborLevelPointer :
-					 leftNeighbor.rightNeighbors.keySet()) {
-					if (leftNeighborLevelPointer <= nodeToInsert.level) {
-						leftNeighbor.rightNeighbors
-							.remove(leftNeighborLevelPointer);
-					}
-				}
-				leftNeighbor.rightNeighbors.put(1, nodeToInsert);
-				leftNeighbor.rightNeighbors.put(nodeToInsert.level, nodeToInsert);
+			if (this.listLevel == 0) {
+				nodeToInsert = new Node(data, 1);
 			} else {
-				leftNeighbor.rightNeighbors.clear();
-				leftNeighbor.rightNeighbors.put(1, nodeToInsert);
-				leftNeighbor.rightNeighbors.put(leftNeighbor.level, nodeToInsert);
-				// Update all nodes before the left neighbor to have
-				// proper pointers to the inserted node if necessary.
-				currentNode = this.header;
-				currentLevel = this.listLevel;
-				while (currentLevel > 1) {
-					nodeToCompare = currentNode.rightNeighbors.get(currentLevel);
-					if (nodeToCompare != null) {
-						if (data.compareTo(nodeToCompare.data) > 0) {
-							currentNode = nodeToCompare;
-						} else if (data.compareTo(nodeToCompare.data) < 0) {
-							lastNodeTraversedDown = currentNode;
-							currentLevel--;
+				Random rand = new Random(2 * this.listLevel - 1);
+				nodeToInsert = new Node(data, rand.nextInt() + 1);
+				nodeToInsert.rightNeighbors
+				.put(1, leftNeighbor.rightNeighbors.get(1));
+				// Ensure the inserted node points to a right-hand
+				// neighbor, whose level is greater than or equal
+				// to that of the inserted node.
+				currentNode = nodeToInsert;
+				// This is to ensure whatever level smaller than
+				// that of the inserted node is encountered will
+				// be recorded.
+				int lowestLevelPointed = -1;
+				while (!currentNode.equals(sentinel)) {
+					if (currentNode.level >= nodeToInsert.level) {
+						// This is a blocking right-hand neighbor, thus,
+						// update the inserted node's pointer and break.
+						nodeToInsert.rightNeighbors.put(nodeToInsert.level, currentNode);
+						break;
+					} else {
+						// If this is a non-blocking right-hand neighbor,
+						// update the inserted node's pointer but continue.
+						if (lowestLevelPointed == -1 ||
+							lowestLevelPointed < currentNode.level) {
+							lowestLevelPointed = currentNode.level;
+							nodeToInsert.rightNeighbors.put(currentNode.level, currentNode);
 						}
-					} else currentLevel--;
+					}
+					currentNode = currentNode.rightNeighbors.get(1);
 				}
-				if (lastNodeTraversedDown != null) {
-					for (int i = nodeToInsert.level; i > 1; i--) {
-						nodeToCompare = lastNodeTraversedDown.rightNeighbors.get(i);
-						if (nodeToCompare != null && nodeToCompare.data.compareTo(data) >= 0) {
-							lastNodeTraversedDown.rightNeighbors
-								.put(nodeToInsert.level, nodeToInsert);
+				// Ensure the immediately left-hand neighbor
+				// correctly points to the inserted node.
+				if (leftNeighbor.level >= nodeToInsert.level) {
+					for (int leftNeighborLevelPointer :
+						 leftNeighbor.rightNeighbors.keySet()) {
+						if (leftNeighborLevelPointer <= nodeToInsert.level) {
+							leftNeighbor.rightNeighbors
+								.remove(leftNeighborLevelPointer);
+						}
+					}
+					leftNeighbor.rightNeighbors.put(1, nodeToInsert);
+					leftNeighbor.rightNeighbors.put(nodeToInsert.level, nodeToInsert);
+				} else {
+					leftNeighbor.rightNeighbors.clear();
+					leftNeighbor.rightNeighbors.put(1, nodeToInsert);
+					leftNeighbor.rightNeighbors.put(leftNeighbor.level, nodeToInsert);
+					// Update all nodes before the left neighbor to have
+					// proper pointers to the inserted node if necessary.
+					currentNode = this.header;
+					currentLevel = this.listLevel;
+					while (currentLevel > 1) {
+						nodeToCompare = currentNode.rightNeighbors.get(currentLevel);
+						if (nodeToCompare != null) {
+							if (data.compareTo(nodeToCompare.data) > 0) {
+								currentNode = nodeToCompare;
+							} else if (data.compareTo(nodeToCompare.data) < 0) {
+								lastNodeTraversedDown = currentNode;
+								currentLevel--;
+							}
+						} else currentLevel--;
+					}
+					if (lastNodeTraversedDown != null) {
+						for (int i = nodeToInsert.level; i > 1; i--) {
+							nodeToCompare = lastNodeTraversedDown.rightNeighbors.get(i);
+							if (nodeToCompare != null && nodeToCompare.data.compareTo(data) >= 0) {
+								lastNodeTraversedDown.rightNeighbors
+									.put(nodeToInsert.level, nodeToInsert);
+							}
 						}
 					}
 				}
 			}
+
 			if (this.listLevel < nodeToInsert.level) {
 				this.listLevel = nodeToInsert.level;
 			}
