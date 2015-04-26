@@ -228,6 +228,7 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 	}
 
 	public void delete(T data) {
+		boolean metNodeToRemove = false;
 		NodeEntry<Boolean, Node> entry = find(data);
 		if (!entry.getKey()) return;
 		else {
@@ -243,14 +244,24 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 						currentLevel--;
 					} else if (nodeToCompare.data.compareTo(nodeToRemove.data) < 0) {
 						currentNode = nodeToCompare;
+						metNodeToRemove = false;
 					} else { // That is nodeToCompare == nodeToRemove.
+						metNodeToRemove = true;
 						if (nodeToCompare.nextNodes.get(currentLevel) != null) {
 							currentNode.nextNodes.put(currentLevel,
 									nodeToCompare.nextNodes.get(currentLevel));
 						}
 						currentLevel--;
 					}
-				} else currentLevel--;
+				} else {
+					if (metNodeToRemove) {
+						if (nodeToRemove.nextNodes.get(currentLevel) != null) {
+							currentNode.nextNodes.put(currentLevel,
+									nodeToRemove.nextNodes.get(currentLevel));
+						}
+					}
+					currentLevel--;
+				}
 			}
 		}
 	}
