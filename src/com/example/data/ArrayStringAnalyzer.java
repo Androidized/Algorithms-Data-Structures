@@ -3,7 +3,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-
 public class ArrayStringAnalyzer {
 
 	static class Palindrome {
@@ -31,7 +30,6 @@ public class ArrayStringAnalyzer {
 				  { 6, 7, 8}
 				};
 		resetRowsColumns(multi);
-		
 	}
 	
 	public final static boolean hasUniqueCharacters(StringBuilder str)
