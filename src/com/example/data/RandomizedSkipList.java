@@ -101,12 +101,8 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 	}
 
 	public Node insert(T data) {
-		int currentLevel;
 		Node leftNeighbor;
-		Node currentNode;
 		Node nodeToInsert;
-		Node nodeToCompare;
-		Node lastNodeTraversedDown = null;
 
 		NodeEntry<Boolean, Node> entry = find(data);
 		// Return the node in the list that has identical
@@ -123,14 +119,12 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 				// the first node inserted into the list or
 				// the one with the smallest data value.
 				if (this.numberOfNodes == 0) {
-					// The first added node. Let the node point to
-					// sentinel and let the header point to it all
-					// at level "1".
+					// This is the first node added to the list.
+					// Let this node point to the sentinel.
 					nodeToInsert = new Node(data, 1);
 					nodeToInsert.nextNodes.put(1, this.sentinel);
-					this.header.nextNodes.put(1, nodeToInsert);
 				} else {
-					// The node with smallest data value.
+					// This is a node with smallest data value in the list.
 					nodeToInsert = new Node(data,
 							new Random(2 * this.listLevel - 1).nextInt() + 1);
 					// Let this node point to where the header used to point.
@@ -139,85 +133,39 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 						this.header.nextNodes.remove(i);
 					}
 					this.header.nextNodes.put(nodeToInsert.level, nodeToInsert);
-					this.header.nextNodes.put(1, nodeToInsert);
 					// Update the inserted node's pointer relation with
 					// all right hand neighbors.
-					updatePointersToRightNeighbors(nodeToInsert);
+					updatePointersToRight(nodeToInsert);
 				}
-				this.numberOfNodes++;
-				return nodeToInsert;
+				// Let the header point to it at level "1".
+				this.header.nextNodes.put(1, nodeToInsert);
 			} else {
 				nodeToInsert = new Node(data,
 						new Random(2 * this.listLevel - 1).nextInt() + 1);
-				// Let this node point to where the left neighbor used
-				// to point, while letting the left neighbor point to
-				// this node.
+				// Let the node point to where the left neighbor used to point.
 				nodeToInsert.nextNodes
 					.put(1, leftNeighbor.nextNodes.get(1));
 				// Update the inserted node's pointer relation with
-				// all right hand neighbors.
-				updatePointersToRightNeighbors(nodeToInsert);
-				// Ensure the immediate left-hand neighbor
-				// correctly points to the inserted node. If
-				// the this node has higher level than the
-				// inserted one, it is a blocking node; thus,
-				// no need to update the rest of left-hand
-				// neighbors.
-				if (leftNeighbor.level >= nodeToInsert.level) {
-					for (int i = nodeToInsert.level; i > 0; i--) {
-						leftNeighbor.nextNodes.remove(i);
-					}
-					leftNeighbor.nextNodes.put(1, nodeToInsert);
-					leftNeighbor.nextNodes
-						.put(nodeToInsert.level, nodeToInsert);
-				} else {
-					leftNeighbor.nextNodes.clear();
-					leftNeighbor.nextNodes.put(1, nodeToInsert);
-					leftNeighbor.nextNodes.put(leftNeighbor.level, nodeToInsert);
-					// Update all nodes before the left neighbor to have
-					// proper pointers to the inserted node if necessary.
-					currentNode = this.header;
-					// We haven't yet updated the list level if the new
-					// node has greater level than the current list level.
-					// This makes it possible to update the existing nodes
-					// that are on the left hand side of the new node.
-					currentLevel = this.listLevel;
-					while (currentLevel > 1) {
-						nodeToCompare = currentNode.nextNodes.get(currentLevel);
-						if (nodeToCompare != null) {
-							if (data.compareTo(nodeToCompare.data) > 0) {
-								currentNode = nodeToCompare;
-							} else if (data.compareTo(nodeToCompare.data) < 0) {
-								lastNodeTraversedDown = currentNode;
-								currentLevel--;
-							} else {
-								return nodeToInsert;
-							}
-						} else currentLevel--;
-					}
-					if (lastNodeTraversedDown != null) {
-						for (int i = nodeToInsert.level; i > 1; i--) {
-							nodeToCompare = lastNodeTraversedDown.nextNodes.get(i);
-							if (nodeToCompare != null && nodeToCompare.data.compareTo(data) >= 0) {
-								lastNodeTraversedDown.nextNodes
-									.put(nodeToInsert.level, nodeToInsert);
-							}
-						}
-					}
-				}
+				// all right hand side neighbors.
+				updatePointersToRight(nodeToInsert);
+				// Ensure the left hand side neighbors correctly point
+				// to the inserted node if necessary.
+				updatePointersFromLeft(nodeToInsert);
 			}
 
-			// If the added node is has the highest,
-			// level let the header point to it, too.
+			// If the added node has the highest level,
+			// update the skip list level.
 			if (this.listLevel < nodeToInsert.level) {
 				this.listLevel = nodeToInsert.level;
 				this.header.nextNodes.put(nodeToInsert.level, nodeToInsert);
 			}
+
+			this.numberOfNodes++;
 			return nodeToInsert;
 		}
 	}
 
-	private void updatePointersToRightNeighbors(final Node nodeToInsert) {
+	private void updatePointersToRight(final Node nodeToInsert) {
 		Node currentNode;
 		// Ensure the inserted node points to proper right hand neighbors.
 		// Ensure whatever level smaller than that of the inserted node,
@@ -240,6 +188,42 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 				}
 			}
 			currentNode = currentNode.nextNodes.get(1);
+		}
+	}
+
+	private void updatePointersFromLeft(final Node nodeToInsert) {
+		Node nodeToCompare;
+		Node currentNode = this.header;
+		int currentLevel = this.listLevel;
+		while (currentLevel > 0) {
+			nodeToCompare = currentNode.nextNodes.get(currentLevel);
+			if (nodeToCompare != null) {
+				if (currentLevel > nodeToInsert.level) {
+					if (nodeToCompare.data.compareTo(nodeToInsert.data) > 0) {
+						currentLevel--;
+					} else if (nodeToCompare.data.compareTo(nodeToInsert.data) < 0) {
+						currentNode = nodeToCompare;
+					} // The equality condition should never occur.
+				} else {
+					if (nodeToCompare.data.compareTo(nodeToInsert.data) > 0) {
+						// In some cases, the following may lead to duplicate
+						// pointers to the same right hand side neighbor.
+						currentNode.nextNodes.put(currentLevel, nodeToInsert);
+						currentLevel--;
+					} else if (nodeToCompare.data.compareTo(nodeToInsert.data) < 0) {
+						currentNode = nodeToCompare;
+					} // The equality condition should never occur.
+				}
+			} else {
+				if (currentLevel <= nodeToInsert.level) {
+					// In cases, the following possibly leads to several
+					// duplicate pointers to the same right hand neighbor
+					// if the inserted node is to be last node in the list,
+					// and the current node is its left hand side neighbor.
+					currentNode.nextNodes.put(currentLevel, nodeToInsert);
+				}
+				currentLevel--;
+			}
 		}
 	}
 
@@ -279,5 +263,21 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 			}
 		}
 	}
-}
 
+	private void removeDuplicatePointers(final Node node) {
+		Node previousPointer = null;
+		for (int i = node.level; i > 0; i--) {
+			if (node.nextNodes.get(i) != null) {
+				if (previousPointer != null) {
+					if (previousPointer.equals(node.nextNodes.get(i))) {
+						node.nextNodes.remove(i);
+					} else {
+						previousPointer = node.nextNodes.get(i);
+					}
+				} else {
+					previousPointer = node.nextNodes.get(i);
+				}
+			}
+		}
+	}
+}
