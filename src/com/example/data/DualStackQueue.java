@@ -1,24 +1,16 @@
 package com.example.data;
 
 public class DualStackQueue<T extends Comparable<? super T>> {
-	private InefficientGenericStack<T> producerStack;
-	private InefficientGenericStack<T> consumerStack;
+	private GenericStack<T> producerStack;
+	private GenericStack<T> consumerStack;
 
 	DualStackQueue() {
-		producerStack = new InefficientGenericStack<T>();
-		consumerStack = new InefficientGenericStack<T>();
+		producerStack = new GenericStack<T>();
+		consumerStack = new GenericStack<T>();
 	}
 
 	public void write(T data) {
 		synchronized (producerStack) {
-			while (producerStack.isFull()) {
-				try {
-					producerStack.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-
 			producerStack.push(data);
 			producerStack.notify();
 		}
@@ -42,9 +34,9 @@ public class DualStackQueue<T extends Comparable<? super T>> {
 				}
 			}
 
-			while (!producerStack.isEmpty()) {
+			do {
 				consumerStack.push(producerStack.pop());
-			}
+			} while (!producerStack.isEmpty());
 
 			producerStack.notify();
 		}
