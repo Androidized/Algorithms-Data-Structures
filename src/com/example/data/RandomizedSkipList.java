@@ -231,35 +231,26 @@ public final class RandomizedSkipList<T extends Comparable<? super T>> {
 		NodeEntry<Boolean, Node> entry = find(data);
 		if (!entry.getKey()) return;
 		else {
-			Node nodeToRemove = null;
+			Node nodeToRemove = entry.getValue();
 			Node nodeToCompare = null;
-			Node leftNeighbor = this.header;
 			Node currentNode = this.header;
 			int currentLevel = this.listLevel;
-			while (currentLevel > 0) {
-				do {
-					nodeToCompare = currentNode.nextNodes.get(currentLevel--);
-				} while ((nodeToCompare.equals(sentinel) ||
-						 nodeToCompare.data.compareTo(data) > 0) &&
-						 currentLevel != -1);
-				if (currentLevel == -1) break;
-				if (nodeToCompare.data.compareTo(data) == 0) {
-					// TODO: Remove the node and link previous node to next.
-					break;
-				}
-				currentNode = nodeToCompare;
-			}
 
-			if (nodeToRemove != null &&
-				leftNeighbor.equals(this.header) &&
-				nodeToRemove.nextNodes.get(1).equals(this.sentinel)) {
-				this.header.nextNodes.put(1, this.sentinel);
-				// Reset the list level to "0" only when
-				// it becomes empty. Tracking the list
-				// level in cases other than this particular
-				// scenario is rather complex, which is
-				// avoided purposely.
-				this.listLevel = 0;
+			while (currentLevel > 0) {
+				nodeToCompare = currentNode.nextNodes.get(currentLevel);
+				if (nodeToCompare != null) {
+					if (nodeToCompare.data.compareTo(nodeToRemove.data) > 0) {
+						currentLevel--;
+					} else if (nodeToCompare.data.compareTo(nodeToRemove.data) < 0) {
+						currentNode = nodeToCompare;
+					} else { // That is nodeToCompare == nodeToRemove.
+						if (nodeToCompare.nextNodes.get(currentLevel) != null) {
+							currentNode.nextNodes.put(currentLevel,
+									nodeToCompare.nextNodes.get(currentLevel));
+						}
+						currentLevel--;
+					}
+				} else currentLevel--;
 			}
 		}
 	}
