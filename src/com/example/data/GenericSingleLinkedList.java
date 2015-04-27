@@ -1,11 +1,13 @@
 package com.example.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.example.data.exception.EmptyDataStructureException;
 import com.example.data.exception.EmptyQueueException;
 
 public class GenericSingleLinkedList<T extends Comparable<? super T>> {
 	private Node root;
-	private Node nodeWithMinData;
 
 	GenericSingleLinkedList() {
 
@@ -14,7 +16,7 @@ public class GenericSingleLinkedList<T extends Comparable<? super T>> {
 	class Node {
 		T data;
 		Node next;
-		Node minBeneathThis;
+		Node minBeforeThis;
 
 		Node(T data) {
 			this.data = data;
@@ -37,78 +39,82 @@ public class GenericSingleLinkedList<T extends Comparable<? super T>> {
 		}
 	}
 
-	public void printContent() {
+	@SuppressWarnings("unchecked")
+	public T[] serialize() {
+		if (this.root == null) return null;
+
+		List<T> arrayOfElements = new ArrayList<T>();
 		Node currentNode = this.root;
 		while (currentNode != null) {
-			if (currentNode.data != null)
-				System.out.println(currentNode.data.toString());
-			else
-				System.out.println("NULL");
-
+			arrayOfElements.add(currentNode.data);
 			currentNode = currentNode.next;
 		}
+
+		T[] serializedLinkedList = (T[]) new Object[arrayOfElements.size()];
+		for (int i = 0; i < arrayOfElements.size(); i++) {
+			serializedLinkedList[i] = arrayOfElements.get(i);
+		}
+
+		return serializedLinkedList;
 	}
 
-	public Node getNodeWithMinData() {
-		return this.nodeWithMinData;
+	public T getMin() {
+		if (this.root == null) return null;
+		return this.root.minBeforeThis.data;
+	}
+
+	public Node getMinNode() {
+		if (this.root == null) return null;
+		return this.root.minBeforeThis;
 	}
 
 	public boolean isEmpty() {
 		return this.root == null;
 	}
 
-	public GenericSingleLinkedList<T> appendToTail(T data) {
+	public GenericSingleLinkedList<T> add(T data) {
+		Node node = new Node(data, this.root);
 		if (this.root == null) {
-			this.root = new Node(data);
+			node.minBeforeThis = node;
 		} else {
-			Node node = this.root;
-			while (node.next != null) {
-				node = node.next;
-			}
-			node.next = new Node(data);
+			node.minBeforeThis = data.compareTo(this.root.minBeforeThis.data) < 0
+					? node : this.root.minBeforeThis;
 		}
+		this.root = node;
 		return this;
 	}
 
-	public GenericSingleLinkedList<T> appendToHead(T data) {
-		Node newNode = new Node(data);
-		newNode.next = this.root;
-        if (this.root == null) {
-			this.nodeWithMinData = newNode;
-		}
-        this.root = newNode;
-        newNode.minBeneathThis = this.nodeWithMinData;
-        if (this.nodeWithMinData.data.compareTo(newNode.data) > 0) {
-        	this.nodeWithMinData = newNode;
-        }
+	public T deleteNodeWithData(T data) throws NullPointerException {
+		if (data == null) throw new NullPointerException();
+		if (this.root == null) return null;
 
-		return this;
-	}
+		T toBeDeletedData = null;
 
-	public Node deleteNodeWithData(T data) {
-		Node toBeDeletedNode = null;
-		Node currentNode = this.root;
-
-		if (currentNode.data.equals(data)) {
-			toBeDeletedNode = this.root;
+		if (this.root.data.equals(data)) {
+			toBeDeletedData = this.root.data;
 			this.root = this.root.next;
-			return toBeDeletedNode;
+			return toBeDeletedData;
 		}
 
-		while (currentNode.next != null) {
-			if (currentNode.next.data.equals(data)) {
-				toBeDeletedNode = currentNode.next;
-				currentNode.next = currentNode.next.next;
-				break;
+		Node currentNode = this.root.next;
+		while (currentNode != null) {
+			if (currentNode.data.equals(data)) {
+				if (currentNode.next != null) {
+					currentNode.data = currentNode.next.data;
+					
+				} else {
+					
+				}
 			}
 		}
-		return toBeDeletedNode;
+
+		return toBeDeletedData;
 	}
 
 	public Node deleteFromHead() throws EmptyDataStructureException {
 		if (this.root == null) throw new EmptyDataStructureException();
 		if (this.nodeWithMinData == this.root) {
-			this.nodeWithMinData = this.root.minBeneathThis;
+			this.nodeWithMinData = this.root.minBeforeThis;
 		}
 		Node toBeDeletedNode = this.root;
 		this.root = this.root.next;
