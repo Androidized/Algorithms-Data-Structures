@@ -1,7 +1,9 @@
 package com.example.test;
 
 import java.util.HashSet;
+import java.util.InputMismatchException;
 import java.util.Iterator;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.Stack;
 
@@ -14,10 +16,21 @@ import com.example.sort.GenericSortEngine;
 @SuppressWarnings("unused")
 public class Main {
 	public static void main(String[] args) {
+		int height = 1;
+		int numberOfCycles = 1;
+		int i = 1;
+		while (i <= numberOfCycles) {
+			if ((i & 1) == 0) // Even
+				height++;
+			else // Odd
+				height = height * 2;
+			i++;
+		}
+		System.out.println(height);
 
-		Integer[] firstArray = new Integer[]{4, 2, 1, 5, 6, 3, 7};
-		GenericBinarySearchTree<Integer> gbst = new GenericBinarySearchTree<Integer>();
-		System.out.println("Is pre-Order Traversal: " + gbst.isPreOrderTraversal(firstArray));
+//		Integer[] firstArray = new Integer[]{4, 2, 1, 5, 6, 3, 7};
+//		GenericBinarySearchTree<Integer> gbst = new GenericBinarySearchTree<Integer>();
+//		System.out.println("Is pre-Order Traversal: " + gbst.isPreOrderTraversal(firstArray));
 //		RandomEngine.suffleInt(firstArray);
 		
 //		GenericRecursionEngine<Integer> recursionEngine = new GenericRecursionEngine<Integer>();
