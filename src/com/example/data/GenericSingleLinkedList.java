@@ -84,44 +84,57 @@ public class GenericSingleLinkedList<T extends Comparable<? super T>> {
 		return this;
 	}
 
-	public T deleteNodeWithData(T data) throws NullPointerException {
-		if (data == null) throw new NullPointerException();
-		if (this.root == null) return null;
+	public T deleteNodeWithData(T data) {
+		if (data == null || this.root == null) return null;
 
-		T toBeDeletedData = null;
+		Node currentNode = this.root;
+		Node nodeToDelete;
+		Node nodeToReach;
+		boolean withBlock;
 
-		if (this.root.data.equals(data)) {
-			toBeDeletedData = this.root.data;
-			this.root = this.root.next;
-			return toBeDeletedData;
-		}
-
-		Node currentNode = this.root.next;
-		while (currentNode != null) {
-			if (currentNode.data.equals(data)) {
-				if (currentNode.next != null) {
-					currentNode.data = currentNode.next.data;
-					
-				} else {
-					
+		while (true) {
+			if (currentNode.minBeforeThis.data.compareTo(data) > 0) {
+				// Nodes lining up from the head of the data structure
+				// to the node pointed by the root.minBeforeThis should
+				// have data values greater than the data value to be
+				// deleted from the list. In this case, skip to the node
+				// pointed by root.minBeforeThis.next and continue.
+				currentNode = currentNode.minBeforeThis.next;
+			} else if (currentNode.minBeforeThis.data.compareTo(data) < 0) {
+				nodeToReach = currentNode.minBeforeThis;
+				while (!currentNode.equals(nodeToReach)) {
+					if (currentNode.data.compareTo(data) == 0) {
+						withBlock= true;
+						nodeToDelete = currentNode;
+						break;
+					}
+					currentNode = currentNode.next;
 				}
+			} else {
+				withBlock = false;
+				nodeToDelete = currentNode;
+				break;
 			}
 		}
 
-		return toBeDeletedData;
+		if (withBlock) {
+			nodeToDelete.data = nodeToDelete.next.data;
+			nodeToDelete.next = nodeToDelete.next.next;
+			nodeToDelete.minBeforeThis = nodeToDelete.next.minBeforeThis;
+		} else {
+			
+		}
+
+		return nodeToDelete.data;
 	}
 
-	public Node deleteFromHead() throws EmptyDataStructureException {
-		if (this.root == null) throw new EmptyDataStructureException();
-		if (this.nodeWithMinData == this.root) {
-			this.nodeWithMinData = this.root.minBeforeThis;
-		}
-		Node toBeDeletedNode = this.root;
+	public T deleteFromHead() throws EmptyDataStructureException {
+		if (this.root == null)
+			throw new EmptyDataStructureException();
+
+		T headData = this.root.data;
 		this.root = this.root.next;
-		if (this.root == null) {
-			this.nodeWithMinData = null;
-		}
-		return toBeDeletedNode;
+		return headData;
 	}
 
 	public Node deleteFromTail() throws EmptyDataStructureException {
