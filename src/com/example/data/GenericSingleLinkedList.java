@@ -84,48 +84,71 @@ public class GenericSingleLinkedList<T extends Comparable<? super T>> {
 		return this;
 	}
 
-	public T deleteNodeWithData(T data) {
-		if (data == null || this.root == null) return null;
+	public void deleteNodeWithData(T data) {
+		if (data == null || this.root == null) return;
+		
+		if (root.minBeforeThis.data.compareTo(data) > 0) {
+			// Nodes lining up from the head of the data structure
+			// to the node pointed by the root.minBeforeThis should
+			// have data values greater than the data value to be
+			// deleted from the list. Moreover, any subsequent block
+			// of zero or more nodes pointing to the same node with
+			// minimum data value with that block should have data
+			// values greater than that of the query data value.
+			// This means that there is no node with the query value
+			// that can be deleted from the list.
+			return;
+		}
 
 		Node currentNode = this.root;
-		Node nodeToDelete;
+		Node headOfBlock;
 		Node nodeToReach;
-		boolean withBlock;
+		boolean found = false;
 
-		while (true) {
-			if (currentNode.minBeforeThis.data.compareTo(data) > 0) {
-				// Nodes lining up from the head of the data structure
-				// to the node pointed by the root.minBeforeThis should
-				// have data values greater than the data value to be
-				// deleted from the list. In this case, skip to the node
-				// pointed by root.minBeforeThis.next and continue.
-				currentNode = currentNode.minBeforeThis.next;
-			} else if (currentNode.minBeforeThis.data.compareTo(data) < 0) {
-				nodeToReach = currentNode.minBeforeThis;
-				while (!currentNode.equals(nodeToReach)) {
-					if (currentNode.data.compareTo(data) == 0) {
-						withBlock= true;
-						nodeToDelete = currentNode;
-						break;
-					}
-					currentNode = currentNode.next;
-				}
+		// Find the block where to search for the data value.
+		while (currentNode.minBeforeThis.next
+				.minBeforeThis.data.compareTo(data) < 0) {
+			currentNode = currentNode.minBeforeThis.next;
+		}
+
+		// Scan through the block to find a match.
+		headOfBlock = currentNode;
+		nodeToReach = currentNode.minBeforeThis.next;
+		while (!currentNode.equals(nodeToReach)) {
+			if (currentNode.data.compareTo(data) != 0) {
+				currentNode = currentNode.next;
 			} else {
-				withBlock = false;
-				nodeToDelete = currentNode;
+				found = true;
 				break;
 			}
 		}
 
-		if (withBlock) {
-			nodeToDelete.data = nodeToDelete.next.data;
-			nodeToDelete.next = nodeToDelete.next.next;
-			nodeToDelete.minBeforeThis = nodeToDelete.next.minBeforeThis;
-		} else {
-			
+		Node temp = headOfBlock;
+		if (found) {
+			if (currentNode.minBeforeThis.equals(currentNode)) {
+				// When the node to delete is the one with
+				// the minimum data value within the block.
+				while (!temp.equals(currentNode.next)) {
+					add(temp.data);
+					temp = temp.next;
+				}
+				headOfBlock.data = currentNode.next.data;
+				headOfBlock.minBeforeThis = currentNode.next.minBeforeThis;
+			} else if (currentNode.next.equals(currentNode.minBeforeThis)) {
+				// When the node to delete is the immediate right neighbor
+				// of the node with the minimum data value within the block.
+				currentNode.data = currentNode.next.data;
+				currentNode.next = currentNode.next.next;
+				currentNode.minBeforeThis = currentNode;
+				while (!temp.equals(currentNode)) {
+					temp.minBeforeThis = currentNode;
+					temp = temp.next;
+				}
+			} else {
+				currentNode.data = currentNode.next.data;
+				currentNode.next = currentNode.next.next;
+			}
 		}
-
-		return nodeToDelete.data;
 	}
 
 	public T deleteFromHead() throws EmptyDataStructureException {
