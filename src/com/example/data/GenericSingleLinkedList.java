@@ -140,7 +140,7 @@ public class GenericSingleLinkedList<T extends Comparable<? super T>> {
 				currentNode.data = currentNode.next.data;
 				currentNode.next = currentNode.next.next;
 				currentNode.minBeforeThis = currentNode;
-				while (!temp.equals(currentNode)) {
+				while (!temp.equals(currentNode.next)) {
 					temp.minBeforeThis = currentNode;
 					temp = temp.next;
 				}
@@ -149,33 +149,6 @@ public class GenericSingleLinkedList<T extends Comparable<? super T>> {
 				currentNode.next = currentNode.next.next;
 			}
 		}
-	}
-
-	public T deleteFromHead() throws EmptyDataStructureException {
-		if (this.root == null)
-			throw new EmptyDataStructureException();
-
-		T headData = this.root.data;
-		this.root = this.root.next;
-		return headData;
-	}
-
-	public Node deleteFromTail() throws EmptyDataStructureException {
-		Node toBeDeletedNode = null;
-		if (this.root == null) throw new EmptyDataStructureException();
-		if (this.root.next == null) {
-			toBeDeletedNode = this.root;
-			this.root = null;
-			return toBeDeletedNode;
-		}
-
-		Node currentNode = this.root;
-		while (currentNode.next != null && currentNode.next.next != null) {
-			currentNode = currentNode.next;
-		}
-		toBeDeletedNode = currentNode.next;
-		currentNode.next = null;
-		return toBeDeletedNode;
 	}
 
 	public Node peek() {
