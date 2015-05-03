@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ArrayStringAnalyzer {
+public class ArrayStringAnalyzer<T> {
 
 	static class Palindrome {
 		boolean isOdd;
@@ -256,6 +256,59 @@ public class ArrayStringAnalyzer {
 				System.out.print(matrix[i][j]);
 			}
 			System.out.println("\n");
+		}
+	}
+
+	/**
+	 * Spirally traverse a matrix 
+	 */
+	public static <T> void spiralTraverse(T[][] matrix) {
+		if (matrix == null) return;
+
+		int upperLimit = (int) Math.floor(Math
+				.min(matrix.length, matrix[0].length)) / 2;
+
+		for (int i = 0; i < upperLimit; i++) {
+			traverse(true, false, i, i, matrix);
+			traverse(false, false, upperLimit - i, i, matrix);
+			traverse(true, true, upperLimit - i, i, matrix);
+			traverse(false, true, i, i, matrix);
+		}
+	}
+
+	/**
+	 * Helper method to traverse a specified row or column
+	 * of a matrix, either in forward or reverse direction,
+	 * and given an offset from the front and the tail of
+	 * the specified row or column 
+	 */
+	private static <T> void traverse(boolean isRow, boolean isReversal,
+			int which, int offset, T[][] matrix) {
+		if (matrix == null) return;
+
+		int upperLimit = (int) Math.floor(Math
+				.min(matrix.length, matrix[0].length)) / 2;
+
+		if (isReversal) {
+			if (isRow) {
+				for (int j = upperLimit - offset; j < offset; j--) {
+					System.out.println(matrix[which][j]);
+				}
+			} else {
+				for (int j = upperLimit - offset; j < offset; j--) {
+					System.out.println(matrix[which][j]);
+				}
+			}
+		} else {
+			if (isRow) {
+				for (int j = offset; j < upperLimit - offset; j++) {
+					System.out.println(matrix[which][j]);
+				}
+			} else {
+				for (int j = offset; j < upperLimit - offset; j++) {
+					System.out.println(matrix[j][which]);
+				}
+			}
 		}
 	}
 }
